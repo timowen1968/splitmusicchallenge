@@ -26,23 +26,68 @@
 	<string>1.0.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb1725168737759736</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>1.0.0</string>
+	<key>FacebookAppID</key>
+	<string>1725168737759736</string>
+	<key>FacebookDisplayName</key>
+	<string>Split Blitz Music Challenge</string>
+	<key>KeyboardDisplayRequiresUserAction</key>
+	<false/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>fbapi</string>
+		<string>fb-messenger-api</string>
+		<string>fbauth2</string>
+		<string>fbshareextension</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>akamaihd.net</key>
+			<dict>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+			<key>api.facebook.com</key>
+			<dict/>
+			<key>fbcdn.net</key>
+			<dict>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+			<key>graph.facebook.com</key>
+			<dict/>
+			<key>m.facebook.com</key>
+			<dict/>
+		</dict>
 	</dict>
-	<key>NSMainNibFile</key>
-	<string></string>
 	<key>NSMainNibFile~ipad</key>
 	<string></string>
-	<key>KeyboardDisplayRequiresUserAction</key>
-	<false/>
 	<key>UIRequiresFullScreen</key>
-	<true/>
+	<false/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>allow-navigation</key>
+	<string>https://m.facebook.com/*</string>
 	<key>shouldAutorotateToInterfaceOrientation</key>
 	<true/>
 </dict>
