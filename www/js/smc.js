@@ -1254,17 +1254,16 @@ function smallerFont(){
 
 function shareToFaceBook(){
     try {
-        alert("shareFB");
         var storeRank = rank;
         getRank(points * 1 + overall_score * 1);
-        var message = "Can you recognise a song in just a couple of seconds? Play the Split Blits Impossible Music Challenge and find out.";
+        var message = "Can you recognise a song in just a couple of seconds? Play the Split Blits Music Challenge and find out.";
         var title = 'Split Blits Impossible Music Challenge.'
 
         if (rank != storeRank) {
-            message = "Congratulations, you've readed the level of " + rank + " on the Split Blitz Impossible Music Challenge!"
+            message = "Congratulations, you've reached the level of " + rank + " on the Split Blitz Music Challenge!"
             title = "Promoted to level: " + rank;
         } else if (points > highScore) {
-            message = "Congratulations! Youv'e reached a personal new best on the Split Blits Impossible Music Challenge! " + points + " points."
+            message = "Congratulations! Youv'e reached a personal new best on the Split Blits Music Challenge! " + points + " points."
             title = "Personal new best :" + points;
         }
 

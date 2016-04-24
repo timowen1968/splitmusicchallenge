@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.phonegap.helloworld" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
     <preference name="AllowInlineMediaPlayback" value="false" />
-    <preference name="BackupWebStorage" value="cloud" />
+    <preference name="BackupWebStorage" value="local" />
     <preference name="DisallowOverscroll" value="false" />
     <preference name="EnableViewportScale" value="false" />
     <preference name="SuppressesIncrementalRendering" value="false" />
@@ -32,18 +32,21 @@
     <preference name="fullscreen" value="true" />
     <preference name="KeyboardDisplayRequiresUserAction" value="false" />
     <preference name="MediaPlaybackRequiresUserAction" value="false" />
-    <feature name="FacebookConnectPlugin">
-        <param name="ios-package" value="FacebookConnectPlugin" />
-        <param name="onload" value="true" />
-    </feature>
-    <plugin name="FacebookConnectPlugin" value="FacebookConnectPlugin" />
     <access origin="https://m.facebook.com" />
     <access origin="https://graph.facebook.com" />
     <access origin="https://api.facebook.com" />
     <access origin="https://*.fbcdn.net" />
     <access origin="https://*.akamaihd.net" />
+    <access origin="https://*.facebook.com" />
+    <allow-intent href="https://staticxx.facebook.com/*" />
+    <allow-navigation href="http://*/*" />
+    <allow-navigation href="https://staticxx.facebook.com/*" />
+    <allow-navigation href="https://www.facebook.com/*" />
+    <allow-navigation href="about:blank" />
+
     <allow-intent href="itms:*" />
     <allow-intent href="itms-apps:*" />
+
     <name>Split Music Challenge</name>
     <description>
         Split Music Challenge

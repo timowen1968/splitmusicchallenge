@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "www/js/smc.js"
-            timestampString = "482480849.867145"
+            timestampString = "483188336.831077"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1273"
-            endingLineNumber = "1273"
+            startingLineNumber = "1272"
+            endingLineNumber = "1272"
             landmarkName = "message"
             landmarkType = "7">
          </BreakpointContent>
@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "www/js/smc.js"
-            timestampString = "482482127.790615"
+            timestampString = "483188336.831077"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1271"
-            endingLineNumber = "1271"
+            startingLineNumber = "1270"
+            endingLineNumber = "1270"
             landmarkName = "message"
             landmarkType = "7">
          </BreakpointContent>

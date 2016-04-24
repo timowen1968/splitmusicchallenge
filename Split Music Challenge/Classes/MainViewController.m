@@ -26,9 +26,9 @@
 //
 
 #import "MainViewController.h"
-#import <FBSDKCoreKit/FBSDKCoreKit.h>
-#import <FBSDKLoginKit/FBSDKLoginKit.h>
-#import <FBSDKShareKit/FBSDKShareKit.h>
+//#import <FBSDKCoreKit/FBSDKCoreKit.h>
+//#import <FBSDKLoginKit/FBSDKLoginKit.h>
+//#import <FBSDKShareKit/FBSDKShareKit.h>
 
 @implementation MainViewController
 
@@ -78,22 +78,22 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    FBSDKLoginButton *loginButton = [[FBSDKLoginButton alloc] init];
-    loginButton.center = self.view.center;
-    [self.view addSubview:loginButton];
+//    FBSDKLoginButton *loginButton = [[FBSDKLoginButton alloc] init];
+//    loginButton.center = self.view.center;
+//    [self.view addSubview:loginButton];
     
 //    FBSDKLikeControl *button = [[FBSDKLikeControl alloc] init];
 //    button.objectID = @"https://www.facebook.com/FacebookDevelopers";
 //    [self.view addSubview:button];
 //
-    FBSDKShareLinkContent *content = [[FBSDKShareLinkContent alloc] init];
-    content.contentURL = [NSURL URLWithString:@"http://developers.facebook.com"];
-    [FBSDKShareDialog showFromViewController:self
-                                 withContent:content
-                                    delegate:nil];
-    FBSDKShareButton *button = [[FBSDKShareButton alloc] init];
-    button.shareContent = content;
-    [self.view addSubview:button];
+//    FBSDKShareLinkContent *content = [[FBSDKShareLinkContent alloc] init];
+//    content.contentURL = [NSURL URLWithString:@"http://developers.facebook.com"];
+//    [FBSDKShareDialog showFromViewController:self
+//                                 withContent:content
+//                                    delegate:nil];
+//    FBSDKShareButton *button = [[FBSDKShareButton alloc] init];
+//    button.shareContent = content;
+//    [self.view addSubview:button];
     
 }
 
