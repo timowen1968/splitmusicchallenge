@@ -27,43 +27,14 @@
 
 #import "AppDelegate.h"
 #import "MainViewController.h"
-//#import <FBSDKCoreKit/FBSDKCoreKit.h>
-//#import <FBSDKLoginKit/FBSDKLoginKit.h>
-//#import <FBSDKShareKit/FBSDKShareKit.h>
+
 
 
 @implementation AppDelegate
 
-//- (BOOL)application:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions
-//{
-    // hased out trying to get FB working
-//    self.viewController = [[MainViewController alloc] init];
-//    return [super application:application didFinishLaunchingWithOptions:launchOptions];
-//}
-//- (void)applicationDidBecomeActive:(UIApplication *)application {
-//    [FBSDKAppEvents activateApp];
-//}
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-//    self.viewController = [[MainViewController alloc] init];
-//    [[FBSDKApplicationDelegate sharedInstance] application:application
-//                             didFinishLaunchingWithOptions:launchOptions];
-    // Add any custom logic here.
-//    return YES;
-//
     return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 
-
-// FB method
-//- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-//    BOOL handled = [[FBSDKApplicationDelegate sharedInstance] application:application
-//                                                                  openURL:url
-//                                                        sourceApplication:sourceApplication
-//                                                               annotation:annotation
-//                    ];
-//    // Add any custom logic here.
-//    return handled;
-//}
 
 @end

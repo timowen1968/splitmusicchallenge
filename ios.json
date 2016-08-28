@@ -53,7 +53,7 @@
                     ],
                     "FacebookDisplayName": [
                         {
-                            "xml": "<string>Split Blitz Music Challenge</string>",
+                            "xml": "<string>Split Music Challenge</string>",
                             "count": 1
                         }
                     ],
@@ -79,7 +79,7 @@
         },
         "phonegap-facebook-plugin": {
             "APP_ID": "1725168737759736",
-            "APP_NAME": "Split Blitz Music Challenge",
+            "APP_NAME": "Split Music Challenge",
             "PACKAGE_NAME": "$(PRODUCT_BUNDLE_IDENTIFIER)"
         }
     },

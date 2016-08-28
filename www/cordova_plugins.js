@@ -16,22 +16,6 @@ module.exports = [
             "cordova.logger"
         ]
     },
-    {
-        "file": "plugins/com.jp.plugin.facebook/www/facebook.js",
-        "id": "com.jp.plugin.facebook.Facebook_Plugin",
-        "pluginId": "com.jp.plugin.facebook",
-        "clobbers": [
-            "facebook"
-        ]
-    },
-    {
-        "file": "plugins/phonegap-facebook-plugin/facebookConnectPlugin.js",
-        "id": "phonegap-facebook-plugin.FacebookConnectPlugin",
-        "pluginId": "phonegap-facebook-plugin",
-        "clobbers": [
-            "facebookConnectPlugin"
-        ]
-    }
 ];
 module.exports.metadata = 
 // TOP OF METADATA

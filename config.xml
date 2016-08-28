@@ -43,6 +43,8 @@
     <gap:plugin name="org.apache.cordova.network-information" />
     <gap:plugin name="org.apache.cordova.splashscreen" />
     <gap:plugin name="org.apache.cordova.vibration" />
+    <!-- gap:plugin name="cordova-plugin-x-socialsharing" source="npm" / -->
+<gap:plugin name="nl.x-services.plugins.socialsharing" version="4.3.8" />
     <icon src="icon.png" />
     <icon gap:platform="android" gap:qualifier="ldpi" src="www/res/icon/android/icon-36-ldpi.png" />
     <icon gap:platform="android" gap:qualifier="mdpi" src="www/res/icon/android/icon-48-mdpi.png" />
@@ -68,6 +70,10 @@
     <gap:splash gap:platform="ios" height="1024" src="www/res/screen/ios/screen-ipad-portrait.png" width="768" />
     <gap:splash gap:platform="ios" height="768" src="www/res/screen/ios/screen-ipad-landscape.png" width="1024" />
     <gap:splash gap:platform="winphone" src="www/res/screen/windows-phone/screen-portrait.jpg" />
+<plugin name="com.phonegap.plugins.facebookconnect" spec="0.4.0"> source="pgb">
+    <param name="APP_ID" value="..." />
+    <param name="APP_NAME" value="..." />
+</plugin>
     <access origin="*" />
     <!--<access origin="http://www.oursort.co.za" />-->
     <plugin name="cordova-plugin-whitelist" version="1" />
@@ -77,9 +83,9 @@
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
-    <allow-intent href="https://staticxx.facebook.com/* />
+    <allow-intent href="https://staticxx.facebook.com/*" />
     <allow-navigation href="http://*/*" />
-    <allow-navigation href="https://staticxx.facebook.com/* />
+    <allow-navigation href="https://staticxx.facebook.com/*" />
     <platform name="android">
         <allow-intent href="market:*" />
     </platform>

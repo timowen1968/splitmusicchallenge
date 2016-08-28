@@ -1,37 +1,43 @@
 /**
- * Created by Tim on 3/9/16.
+ * Created by Tim on 9/3/16.
+ *
  */
-TESTNUMBER = 10;
+
+// Debug values
+var TEST = false;
+var DISABLESWIPE = false;
+var SHOWAUDIO = false;
+
+// Reference to the form
+var f;
+
 var totalCorrect = 0;
-var duration = 1500;
+var duration = 2000;
 var points = 0;
 var overall_score = 0;
 var beenWarned = "false";
-var f;
-// Used in named fields to prevent broweser from auto-populating
+var introRun = "true";
+// Used in named fields to prevent browser from auto-populating
 var randomNumber = Math.ceil((Math.random() * 999999999));
 
 var rankoptions = ["BAMBI", "BAMBI'S MOM", "SUPERMAN", "CHUCK NORRIS", "BATMAN", "JEDI"];
 var rank;
-var store = [0,0,0,0,0,0,0,0,0,0]; // stores timeframe for each track
-var trackIds = []; // Stores the track_id for each song
 var numberReady = [0,0,0,0,0,0,0,0,0,0]; // To check when all tracks are ready to play
 var playFull = "false";
 var storePlayingFull = -1;
 var showedPlayAllMessage = "false";
 var user = "";
 var coinAudio;
+var clickAudio;
 var startDate = new Date();
-var test = true;
 
-var fontWide = " 16pt Lucida Console";
-var fontSizeWide = "21";
-// var fontWide = " 7pt Lucida Console";
-// var fontSizeWide = "3pt";
-var fontMedium = " 12pt Lucida Console";
-var fontSizeMedium = "17";
+var fontWide = " 15pt Lucida Console";
+var fontSizeWide = "15";
+var fontMedium = " 14pt Lucida Console";
+var fontSizeMedium = "14";
 var fontNarrow = " 9pt Lucida Console";
-var fontSizeNarrow = "7";
+var fontSizeNarrow = "9";
+
 
 var fontSize = fontSizeMedium;
 var font = fontMedium;
@@ -40,39 +46,105 @@ var mp3Url = "http://www.oursort.co.za/splitmusicchallenge/mp3/";
 var holdingPosition = 1;
 var Load = [];
 var Tracks = [];
-var introRun = true;
-var holdString = "";
 var genre;
 var decade;
 var playInProgress = false;
-var abortSong = false;
-var playedUpTo = 0;var levelChanged = false;
+var pausePlaying = false;
+var playedUpTo = 0;
+var levelChanged = false;
 var highScore;
+var isMobileDevice;
+var fieldWithFocus; // Needed to blur() when swiping else screen gets messed up
+var context;
+var bufferLoader;
+var CONCURRENTLIMIT = 4;
 
+
+
+function updateStatusCallback(response){
+    if(isMobileDevice){
+        alert("updateStatusCallback " + response.status);
+        message(12,"updateStatusCallback " + response.status);
+    }
+}
+function testConnection(){
+    if(typeof(Load[0]) == "undefined"){
+        noInternet();
+    }
+    
+}
 $(document).ready(function(){
+//    $("#page").hide();
+
+    if(!SHOWAUDIO){ $("audio").prop("controls", false) };
+    
+    isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
+
+    if(!isMobileDevice){
+        $("#fontTR").show();
+        CONCURRENTLIMIT = 99;
+    }
+    // file:///var/mobile/Containers/Bundle/Application/7996818A-7667-44E1-8F59-DDA1133C9A7F/Split%20Music%20Challenge.app/www/index.html
     if(!navigator.onLine){
-        alert("No internet connection");
+        noInternet();
         return false;
     }
-
     f = document.forms[0];
 
     setUp();
+                  
+//    runIntro();
+//                  return;
 
-    $.get("http://www.oursort.co.za/splitmusicchallenge/smc.php?genre=" + f.genre.value + "&decade=" + f.decade.value, function(data) {
+    $.get("http://www.oursort.co.za/splitmusicchallenge/smc.php?genre=" + f.genre.value + "&decade=" + f.decade.value + "&rand=" +
+          Math.random(), function(data) {
         populatePage(data);  });
 
-    if(!test)
+
+    setTimeout(testConnection, 10000);
+    if(!TEST)
     {
-        $("#infoRow11").css("display", "none");
-        $("#infoRow12").css("display", "none");
+                  $("#infoRow11").hide();
+                  $("#infoRow12").hide();
+                  $("#infoRow13").hide();
     }
     // facebook.login( function(success) { alert(success); }, function(error) { alert(error); } );
     coinAudio = document.getElementById("coinAudio");
-    // coinAudio.play;
-     
-    $(window).on('resize orientationChange', function(event) { handleViewport(); });
+    clickAudio = document.getElementById("clickAudio");
+    clickAudio.currentTime = 0;
+    clickAudio.muted = false;
+    clickAudio.loop = false;
 
+    $(window).on('resize orientationChange', function(event) { handleViewport(); });
+    try {
+        $.ajaxSetup({cache: true});
+        $.getScript('http://connect.facebook.net/en_US/sdk.js', function () {
+            // $.getScript('js/sdk.js', function(){
+            FB.init({
+                appId: '1725168737759736',
+                url: 'http://www.oursort.co.za/splitmusicchallenge/index.html',
+                version: 'v2.6' // or v2.0, v2.1, v2.2, v2.3
+            });
+            // console.log("init");
+            $('#loginbutton,#feedbutton').removeAttr('disabled');
+            // console.log("init 2 ");
+            // FB.getLoginStatus(function(response){ alert("response " + response.status) });
+            FB.getLoginStatus(function (response) {
+                updateStatusCallback(response)
+            });
+            //api.facebook.com
+            // api-read.facebook.com
+            // https":"graph.facebook.com
+            // http":"staticxx.facebook.com",
+            // https:\/\/connect.facebook.net\/rsrc.php\
+            // https:\/\/fbstatic-a.akamaihd.net\/rsrc.php
+            // console.log("init 3");
+        });
+    }catch(e){
+        alert("Error 1 " + e);
+    }
+
+//                  alert(window.plugins);
 
 });
 
@@ -84,58 +156,79 @@ function handleViewport(chosenFont){
         height : $(window).height()
     };
 
-    if(typeof (chosenFont) != "undefined"){
-        fontSize = chosenFont + "pt";
-        font = fontWide.replace("16", chosenFont);
-    }else if(viewport.width > 1200) { // laptop
-        font = fontWide;
-        fontSize = fontSizeWide + "pt";
+    if(viewport.width > 1200) { // laptop
+        if(typeof (chosenFont) != "undefined") {
+            fontSize = chosenFont;
+            font = fontWide.replace("15", chosenFont);
+        }else {
+            font = fontWide;
+            fontSize = fontSizeWide;
+        }
         $("#top").css("display", "none");
         $("#page").center();
-        $("#header").css("font", font).css("font-size", fontSize);
+        $("#header").css("font", font).css("font-size", fontSize+"pt");
         $("#optionsImg").prop("size", "20");
         $("select").css("font", font).css("font-size","10pt");
-    }else if(viewport.width > 600){
-        font = fontMedium;
-        fontSize = fontSizeMedium + "pt";
+        $(".buttonTrack").css("font-size", (fontSize-3)+"pt").css("width", (chosenFont)+"pt");
+        $(".buttonTrack:disabled").css("font-size", (fontSize-3)+"pt");
+    }else if(viewport.width > 600){  // Ipad
+        if(typeof (chosenFont) != "undefined") {
+            fontSize = chosenFont;
+            font = fontMedium.replace("14", chosenFont);
+        }else {
+            font = fontMedium;
+            fontSize = fontSizeMedium;
+        }
         $("#top").css("display", "block").css("width", viewport.width);
-        $("#page").css("width","53%").center();
-        $("#header").css("font", font).css("font-size", fontSize);
+        $("#page").css("width","80%").css("background-size", "100%").center();
+        $("#serverData").css("width", "100%");
+        $("#header").css("font", font).css("font-size", fontSize+"pt");
         $("#optionsImg").prop("size", "18");
         $("select").css("font", font).css("font-size","8pt");
+        $(".buttonTrack").css("font-size", (fontSize-3)+"pt").css("width", (chosenFont)+"pt");
+        $(".buttonTrack:disabled").css("font-size", (fontSize-3)+"pt");
     }
-    else{
-        font = fontNarrow;
-        fontSize = fontSizeNarrow + "pt";
+    else{ // iPhone
+        $("#page, #connection").css("background", "url('img/musicimageiphone.jpg') no-repeat").css("background-size", "100% 100%")
+        $("#splash").css("background", "url('img/splashiphone.jpg') no-repeat").css("background-size", "100%")
+        if(typeof (chosenFont) != "undefined") {
+            fontSize = chosenFont;
+            font = fontNarrow.replace("11", chosenFont);
+        }else {
+            font = fontNarrow;
+            fontSize = fontSizeNarrow;
+        }
         $("#top").css("display", "block").css("width", viewport.width);
-        $("#page").css("width", viewport.width).css("position", "absolute").css("top", "100px").center();
-        $("#header").css("font", font).css("font-size", fontSizeMedium);
-        // $("#page").center();
+        $("#page").css("width", viewport.width).css("height", viewport.height).css("top", "100px").center();
+        $("#serverData").css("width", viewport.width);
         $("#optionsImg").prop("size", "10");
         $("select").css("font", font).css("font-size", "7pt").css("color", "black");
-        $("#splash").css("font-size", "16pt");
-        // $("#pause").css("width", viewport.width).css("height", viewport.height).css("line-height", viewport.height + "px").center();
+        $("#splash").css("font-size", "15pt");
+        $(".buttonTrack").css("font-size", (fontSize)+"pt").css("width", (chosenFont*2)+"px");
+        $(".buttonTrack:disabled").css("font-size", (fontSize)+"pt");
     }
     $("#pause").center();
-    $("#resume").center();
 
     message(11, font);
-    message(12, font);
+//    message(12, fontSize);
     $("select").css("background", "#455e9c").css("border", "1px solid #455e9c");
-    // $("#splash").css("width", viewport.width).css("height", viewport.height).css("line-height", viewport.height + "px").css("font", font)
-    //     .center();
     $("#splash").css("width", viewport.width).css("height", viewport.height).css("line-height", viewport.height + "px");
-        // .css("font", font);
+    $("#winsplash").css("width", viewport.width).css("height", viewport.height).css("line-height", viewport.height + "px");
     $("#wideViewport").css("font", font);
     $("#subHeader").css("font", font);
-    $("input").css("font", font);
+    $("input").css("font-size", fontSize+"pt");
     $(".info").css("font", font);
-    $(".buttonTrack").css("font-size", (fontSize)+"pt").css("width", (chosenFont*2));
-    $(".buttonTrack:disabled").css("font-size", (fontSize-2)+"pt").css("width", (chosenFont*2));
+    $("select").css("font-size", (fontSize*1-1)+"pt");
+    $("#subHeader").css("font-size", (fontSize*1+2)+"pt");
+//    $("#runIntro6").center();
+    if(TEST){
+        $("#page").css("background", "");
+    }
+    
     return viewport;
 }
 function refreshTotalScore(){
-    document.getElementById("pointsTD").innerHTML = "Total Score: " + overall_score + "<br>Level: " + rank;
+    document.getElementById("pointsTD").innerHTML = "Total Score: " + Math.floor(overall_score) + "<br>Level: " + rank;
 }
 function getTotalPoints() {
     found = getCookie("overall_score");
@@ -145,18 +238,23 @@ function getTotalPoints() {
     return getRank(found);
 }
 function getRank(found){
+    duration = 2000;
     rank = rankoptions[0];
     if((found*1) < 10000){
+        duration = 3000;
         rank = rankoptions[0];
-    }else if((found*1) < 22900){
-        rank = rankoptions[1];
     }else if((found*1) < 50000){
-        rank = rankoptions[2];
+        duration = 2700;
+        rank = rankoptions[1];
     }else if((found*1) < 100000){
+        duration = 2400;
+        rank = rankoptions[2];
+    }else if((found*1) < 200000){
         rank = rankoptions[3];
     }else if((found*1) < 500000){
         rank = rankoptions[4];
     }else{
+        duration = 1500;
         rank = rankoptions[5];
     }
     return found;
@@ -166,10 +264,11 @@ function audioReady(){
     for(var i = 0; i<10; i++){
         okay+= numberReady[i];
     }
-//    return okay == 10;
-     return okay == 6;
+   return okay == 10;
+//      return okay == 6;
 }
 function checkSong(e, ev){
+    fieldWithFocus = e;
     ev = ev || window.event;
     var charCode = ev.keyCode || ev.which || ev.charCode;
 
@@ -182,7 +281,10 @@ function checkSong(e, ev){
     // Get all the fields in the name of the song and artist
     var es = document.getElementById("row" + number).getElementsByTagName("input");
 
-    if(charCode == 8 && e.value == "" && (typeof(e.oldvalue) == "undefined" || e.oldvalue == "")){
+    // If a key was pressed but the field was empty and is still empty, presume backspace was pressed
+    if(e.value == "" && (typeof(e.oldvalue) == "undefined" || e.oldvalue == "")){
+        var focusField = "";
+        $("#backicon").hide();
 
         var foundNext = false;
         // If user presses backspace at beginning of row, check previous rows for field to focus on
@@ -191,7 +293,8 @@ function checkSong(e, ev){
                 var ess = document.getElementById("row" + jj).getElementsByTagName("input");
                 for(var i=ess.length-1; i>=0; i--){
                     if(ess[i].disabled == false) {
-                        $(ess[i]).focus();
+//                        $(ess[i]).focus();
+                        focusField = ess[i];
                         foundNext = true;
                         break;
                     }
@@ -203,12 +306,26 @@ function checkSong(e, ev){
             for (var i = es.length - 1; i > 0; i--) {
                 if (e == es[i] || keepLooping == "true") {
                     if (es[i - 1].disabled == false) {
-                        $(es[i - 1]).focus();
+//                        $(es[i - 1]).focus();
+                        focusField = es[i - 1];
                         break;
                     }
                     keepLooping = "true";
                 }
             }
+        }
+        if(focusField != ""){
+            if(typeof(e.count) == "undefined" || e.count == 0){
+                var rect = e.getBoundingClientRect();
+                e.count = 1;
+                $("#backicon").removeAttr("disabled").css("font-size", "5px").css("top", (rect.top - 22)+"px").css("left", (rect.left - 0)+"px").show();
+                console.log(e.count + " " + typeof(e.count));
+                return;
+            }else{
+                e.count = 0;
+                focusField.focus();
+            }
+            return;
         }
     }
 
@@ -228,10 +345,13 @@ function checkSong(e, ev){
         }
     }
     // If correct answer automatically focus on next field
-    if(es[indexOfCurrent].value.toUpperCase() == Tracks[number-1].answersText[indexOfCurrent].toUpperCase()){
+    var correctAnswer = Tracks[number-1].answersText[indexOfCurrent].toUpperCase();
+    var entered = es[indexOfCurrent].value.toUpperCase().substr(0,correctAnswer.length);
+    message(13, entered);
+    if(entered == correctAnswer){
         // Correct, so make it green and disable it
         if(indexOfCurrent < (es.length -1)){
-            // Focus on the next empty field
+            // Focus on the next empty field on the same line
             for(var jj=indexOfCurrent +1; jj<(es.length); jj++){
                 // message(11, jj + " " + es[jj].disabled + " " + (es.length-1));
                 if(!es[jj].disabled){
@@ -242,10 +362,17 @@ function checkSong(e, ev){
                 }
             }
             es[indexOfCurrent].value = Tracks[number-1].answersText[indexOfCurrent];
-        }else if(number < 10){
-            $(document.getElementsByName(randomNumber + "~answer_" + (number*1+1*1))[0]).focus();
+//        }else if(number < 10){
+//            $(document.getElementsByName(randomNumber + "~answer_" + (number*1+1*1))[0]).focus();
         }
+        es[indexOfCurrent].style.background = "#9dffc3";
         es[indexOfCurrent].disabled = true;
+    }else if (entered.length >= correctAnswer.length){
+        es[indexOfCurrent].style.background = "indianred";
+        es[indexOfCurrent].value = es[indexOfCurrent].value.substr(0, correctAnswer.length);
+    }else{
+//        es[indexOfCurrent].style.background = "#99ccff";
+        es[indexOfCurrent].style.background = "#99ccff";
     }
     var scoreForSong = Math.ceil(correct / total * 100);
     if (scoreForSong >= 100){
@@ -267,8 +394,9 @@ function checkSong(e, ev){
 
     // Fix the overall_score
     if (totalCorrect == 10){
-        points += 5000;
-        alert("Congratulations! You got it.")
+        e.blur();
+        addPoints(20000);
+        $("#page").toggle('swirl',{spins:2},1000, function(){unswirl()});
         document.getElementById("surrender_all").style.display = "none";
         document.getElementById("getNext").style.display = "table";
 
@@ -277,6 +405,13 @@ function checkSong(e, ev){
 
 }
 
+function winsplashClicked(){
+    $("#winsplash").toggle('swirl',{spins:2},1000, function() {
+                           $("#page").toggle('swirl',{spins:4},1000 ) } );
+}
+function unswirl(){
+    $("#winsplash").center().toggle('swirl',{spins:3},1000, function() { setTimeout(winsplashClicked, 1000) } );
+}
 
 function stopPlay(track){
     document.getElementById("row" + (next)).style.background = "";
@@ -300,7 +435,6 @@ function addCookie(cname, cvalue){
         d.setFullYear(2116);
         var expires = "expires=" + d.toUTCString();
         document.cookie = cname + "=" + cvalue + "; " + expires;
-        message(11, cname + " = " + cvalue);
     }catch (e){
         document.getElementById("debug").innerHTML = "";
     }
@@ -317,333 +451,93 @@ function deleteCookie(cname){
     }
 }
 
-// Once metadata has loaded, this selects a random timesnippet to play
-function setSnippet(audioIndex, count){
-
-    // alert(audioElement + " " + audioElement.src);
-    var track = Load[audioIndex];
-    if(typeof(track) == "undefined"){
-        alert("shold never happen 1");
-        message(idTrack, "Track is undefined");
-        setTimeout(setSnippet, 100, audioIndex);
-        return;
-    }
-    var audioElement = track.getAudio();
-
-    idTrack = audioIndex*1+1;
-    message(idTrack, "Start loading " + count + " "  + audioElement.src);
-    if(typeof(count) == "undefined"){
-        count=0;
-    }
-    message(idTrack, "Have Load object");
-
-    if(track.timeSnippet != 0){ // A snippet has already been generated for this one
-        alert("shold never happen 2");
-        return;
-    }
-    track.percent = 30;
-    message(idTrack, "");
-    if(audioElement.readyState != 4){
-        message(idTrack, "readystate " + audioElement.readyState);
-        if(track.percent < 60) track.percent += 5;
-        setTimeout(setSnippet, 500, audioIndex, ++count);
-        return;
-    }
-
-    track.percent = 60;
-    // message(idTrack, "");
-    message(idTrack, "Selecting time snippet");
-    // Generate a time snippet and store it
-    random = Math.random();
-    var snippy = Math.floor(random * (audioElement.duration - 6))+2; // Need to make sure we have enough seconds to play
-
-    // A duration this small indicates the file is invalid
-    if(audioElement.duration < 30) {
-        alert(audioElement.src + " is not a valid audio file")
-        message(idTrack, " SIZE PROBLEM setSnippet " + random + " * (" + (audioElement.duration) + " - 20) + 15 = " + snippy + " " + audioElement.src);
-        return;
-    }
-    Load[audioIndex].timeSnippet = snippy;
-
-    setTimeout(monitorLoad, 1000, audioIndex); // Give it a second to begin buffering
-}
-
-
 function slotIn(sequence){
+    
     var track = Load[sequence];
+    track.fetching = 0;
+//    if(sequence == 0){
+//        message(13, (new Date() - startDate)/1000);
+//    }
     track.percent = 90;
     var idTrack = sequence * 1 + 1;
-    message(idTrack, "");
-    var savePosition = holdingPosition++ ;
-    holdString += " " + savePosition;
-    var hindex = savePosition - 1;
+    message(idTrack, "slotin");
+    
+    var hindex = idTrack - 1;
     e = track.getAudio();
-    e.pause();
     numberReady[sequence] = 1;
-    // Shift everything for the new position
-    // $(e).prop("id", "snip" + holdingPosition);
 
     $("#infoRow" + idTrack).hide();
 
     var fields = track.inputSong;
 
     if(fields[0].value.toUpperCase() == "BONUS") addPoints(1000);
-    var ename = randomNumber + "~answer_" + savePosition;
+    var ename = randomNumber + "~answer_" + idTrack;
     for(var j=0; j<fields.length; j++){
         fields[j].setAttribute("name", ename);
-        $("#answerContainer"+savePosition).append(fields[j]);
+        $("#answerContainer"+idTrack).append(fields[j]);
     }
-    $("#answerContainer" + savePosition).html($("#answerContainer"+savePosition).html() + "by"); // byTag
+    message(idTrack, "slotin 2");
+    track.percent = 100;
+
+    $("#answerContainer" + idTrack).html($("#answerContainer"+idTrack).html() + "by"); // byTag
     fields = track.inputArtist;
     for(var j=0; j<fields.length; j++){
         fields[j].setAttribute("name", ename);
-        $("#answerContainer"+savePosition).append(fields[j]);
+        $("#answerContainer"+idTrack).append(fields[j]);
     }
-    $("#row" + savePosition).show();
+    message(idTrack, "slotin3");
+    $("#row" + idTrack).show();
     var eles = document.getElementsByName(ename);
-    for(var j=0; j<eles.length;j++){
+    for(j=0; j<eles.length;j++){
         eles[j].onkeyup = function(event){ checkSong(this, event) };
     }
     $("#page").center();
     Tracks[hindex] = track;
-
-    // holdingPosition++;
     
 }
-// Monitors the buffer until the selected snippet is in one of the ranges
-function monitorLoad(sequence, c){
-    var calls = c;
-    if(typeof(c) == "undefined"){
-        calls=0;
+function increasePercent(track, value, max){
+    if (Load[track].percent <= max){
+     Load[track].percent += value;
+    }else{
+        Load[track].percent = max;
     }
-    var track = Load[sequence];
-    message((sequence*1+1), "monitorload " + sequence);
-    if(typeof(track) == "undefined"){
-        setTimeout(monitorLoad, 1000, sequence, ++calls);
-        return;
-    }
-    // alert(track + " " + track.audio);
-    e = track.getAudio();
-    var idTrack = e.id.substr(8);
-
-    // If this one is ready, skip it
-    message(idTrack, "Ready to check buffer (call # " + calls + ")");
-    // message(idTrack,50);
-    if(numberReady[sequence] == 1){
-        message(idTrack, "Finished");
-        return;
-    }
-    // message(idTrack,50);
-    var buffLen = e.buffered.length;
-    message(idTrack, " Buffer exists length " + buffLen);
-    // Wait for the buffer to have contents
-    var count=0;
-    if(e.buffered.length == 0){
-        message(idTrack, " Buffer is empty - count " + ++calls)
-        setTimeout(monitorLoad, 2000, sequence, ++calls);
-        return;
-    }
-    // Give the buffer time to load
-    // while(buffLen <= 0 && count < 1000){
-    //     message(idTrack, " Buffer is empty - count " + count)
-    //     // message(idTrack,50);
-    //
-    //     count++;
-    //     buffLen = e.buffered.length;
-    // }
-    // Should have started by now. If not there is a problem, so try reseting the audio tag
-    if(count >= 1000) {
-        message(idTrack," moitorload Buffer is still empty");
-        resetSrc(e);
-        return;
-    }
-    track.percent = 70;
-    message(idTrack, "");
-    // If the snippet we need has been buffered, then release it
-    var min = track.timeSnippet - 1; // 1 second back for safety
-    var max = (track.timeSnippet + 3) * 1 // 3 seconds ahead to give room to play
-    var buffercount=0;
-    // while(buffercount++ < 100000) {
-        for (i = 0; i < buffLen; i++) {
-            if (e.buffered.start(i) <= min && e.buffered.end(i) >= max) {
-                slotIn(sequence);
-
-                // All loaded? Start the game!
-                // message(12, holdString);
-                if (audioReady() && introRun) {
-                    // Listen for swipe to replay
-                    document.addEventListener('touchstart', handleTouchStart, false);
-                    document.addEventListener('touchmove', handleTouchMove, false);
-                    // $("#page").css("width", "auto");
-                    // $("#page").center();
-                    var endDate = new Date();
-                    message(11, (endDate - startDate)/1000);
-                    // message(11,50);
-                    nextSnippet(0);
-                }
-
-                return;
-            }
-            message(idTrack, i + ": " + track.timeSnippet + " not in buffer " + e.buffered.start(i) + "-" + e.buffered.end(i));
-        }
-    calls++;
-    setTimeout(monitorLoad, 1000, sequence, calls);
-    return;
-    // }
-    return;
-// Sometimes buffer does not finish loading for some reason
-    if(e.buffered.end(0) > 30){
-        message(idTrack, "Changing snippet " + e.buffered.start(0) + " - " + e.buffered.end(0) + " ( " + track.timeSnippet
-                + " ) duration " + e.duration);
-        Load[sequence].timeSnippet = e.buffered.end(0) - 8;
-        monitorLoad(sequence);
-        return;
-    }
-// Sometimes the audio tag NEVER fires a canplay, in which case we remove the tag and replace it.
-    message(idTrack, "Not in buffer " + e.buffered.start(0) + " - " + e.buffered.end(0) + " ( " + track.timeSnippet
-        + " ) duration " + e.duration + " buffer length " + e.buffered.length + " resetting");
-    resetSrc(e);
-
-}
-function message(r, mess){
-    try {
-        var fullmess = "";
-        if (test || r > 10) {
-            mess = (""+mess).replace(/'/g, "").replace(/"/g, "");
-            // var fullmess = mess.replace(/'/g, "").replace(/"/g, "");
-            if (r <= 10) {
-                Load[r - 1].addHistory(mess);
-                fullmess = Load[r - 1].history;
-                // mess = fullmess;
-            }
-            // $("#info" + r).html(r + "<input type='text' class='info' size=1 value='" + r + "' style='visibility:hidden;font:" + font + "'/> " +
-            //     "<div onclass='progress'>" + mess + "</div>");
-            $("#info" + r).html(r + "<input type='text' class='info' size=1 value='" + r + "' style='visibility:hidden;font:" + font + "'/> " +
-                "<div onclick='alert(\"" + fullmess + "\")' onclass='progress'>" + mess + "</div>");
-
-        } else {
-            Load[r - 1].addHistory(mess);
-            var fullmess = Load[r - 1].history;
-
-            var perc = Load[r - 1].percent;
-            var inside = "<table style='width:100%'><tr><td onclick='alert(\"" + fullmess + "\")' style='width:" + perc +
-                "%;background:indianred;text-align:center'>" +
-                // "%;background:#455e9c;text-align:center'>" +
-                "</td><td>&nbsp</td></tr></table>";
-            $("#info" + r).html(inside);
-            // if (perc < 90) {
-            //     Load[r - 1].percent = perc * 1 + 10;
-            // }
-            // alert("");
-        }
-    }catch(e){
-        alert(e  + " r = " + r + " mess = " + mess);
-    }
-
-}
-function nextSnippet(next){
-
-    $("button").prop("disabled", true);
-    $("select").prop("disabled", true);
-    playInProgress = true;
-    // Stop at the end of the playlist
-    if(next == 10) {
-        Tracks[9].stop();
-        $("#row10").css("background","");
-
-        $("button").prop("disabled", false);
-        $("select").prop("disabled", false);
-        playInProgress = false;
-        playedUpTo = 0;
-        return;
-    }
-    if(next != 0){
-        Tracks[next-1].stop();
-        document.getElementById("row" + (next)).style.background = "";
-
-    }
-    if(abortSong){
-        $("button").prop("disabled", false);
-        $("select").prop("disabled", false);
-        playInProgress = false;
-        abortSong = false;
-        return;
-    }
-    playIfReady(next, duration);
-}
-
-function playIfReady(next, duration){
-    if(typeof(Tracks[next]) == "undefined"){
-        message(11, "Track " + next + " is not ready");
-        setTimeout((playIfReady, 200, next, duration));
-    }
-    Tracks[next].play();
-    next++;
-    playedUpTo = next;
-    document.getElementById("row" + (next)).style.background = "#455e9c";
-
-    setTimeout(nextSnippet, duration, next);
-
-}
-// Only happens in Safari
-// Sometimes the audio tag NEVER fires a canplay, in which case we remove the tag and replace it.
-
-function resetSrcOld(e){
-    i=e.id.substr(8);
-    // Remove the entry in the snippet list so it will refresh
-    // Tracks[i-1].timesnippet = 0;
-    e.pause();
-    e.currentTime = 0;
-    e.load();
-    e.play();
-    message(i, "resetSrc");
-    alert("resetSrc");
-}
-
-function resetSrc(e){
-    i=e.id.substr(8);
-    // message(i, "resetSrc " + e.id);
-    // message(11, "resetSrc " + e.id);
-//    alert("Resetting " + e.readyState + " " + e.src);
-   try{
-       var save = e.src;
-       e.pause();
-       e.src = "";
-       Load[i-1].timeSnippet = 0;
-       // e.load();
-       e.src = save;
-       e.load();
-   }catch(e){
-       message(11, e.message);
-
-   }
-   return
+//    message((track*1+1), "");
 }
 
 function replayFull(){
     if(playInProgress) return false;
-
-    nextSnippet(playedUpTo);
+    message(13, "playedUpTo " + playedUpTo);
+//    Tracks[playedUpTo].getAudio.currentTime = Tracks[playedUpTo].snippetNumber * 1 + 1;
+//    if (playedUpTo == 0) playedUpTo = -1; // If we need to start at the first track;
+    nextSnippet(playedUpTo*1+1);
 }
 
+function confirmWarning(response, snippet){
+//    alert(response + " " + snippet);
+    if (!response) return false;
+    addCookie("been_warned", "true");
+    beenWarned = "true";
+    replay(snippet);
+}
 function replay(snippet){
-    // snippet=eid.substr(7);
-    if(beenWarned == "false" && playFull == "false"){
-        a = confirm("Using these replay buttons will cost you points");
-        beenWarned = "true";
-        if (!a) return false;
-        addCookie("been_warned", "true");
+    if(beenWarned == "false" && playFull == "false" && introRun == "true"){
+        messageUser("Using these replay buttons will cost you points", "That's ridiculous!", confirmWarning, snippet);
+        return;
     }
     if(playFull == "false") {
+        if(playInProgress) return false;
+        if(introRun == "true") if(!deductPoints(50)) return;
         document.getElementById("row" + (snippet)).style.background = "#455e9c";
-        deductPoints(10);
+        
         Tracks[snippet-1].play();
+        playInProgress = true;
         setTimeout(function () {
+            playInProgress = false;
             Tracks[snippet-1].stop();
             document.getElementById("row" + (snippet)).style.background = "";
         }, duration );
         var es = document.getElementsByName(randomNumber + "~answer_" + snippet)[0];
-        $(es).focus();
+        if(introRun == "true") $(es).focus();
 
     }else{
         // Game over and user has requested to play the full song
@@ -663,18 +557,35 @@ function replay(snippet){
 }
 
 function showPoints(){
-    $("#score").html("This Game: " + points);
+    $("#score").html("Credits: " + Math.ceil(points));
+}
+function purchaseCredits(response){
+    points+=500;
+    showPoints();
 }
 
+function offerToPurchase(response){
+    if(response){
+        messageUser("Good choice! We are feeling generous today, extra credits are on us.", "", purchaseCredits);
+    }
+}
 function deductPoints(number){
+    if((points - number) < 0){
+        messageUser("You do not have enough credits. Purchase more?", "No Thanks", offerToPurchase);
+//        messageUser("Using these replay buttons will cost you points", "That's ridiculous!", confirmWarning, snippet);
+        
+        return false;
+    }
     points -= number;
     showPoints();
+    return true;
 }
 function addPoints(number){
     points += number;
     showPoints();
 }
 function playAgain(){
+    playClick();
     addCookie("overall_score", (overall_score * 1 + points));
     if(points > highScore){ addCookie("highscore", points) };
     var pause = 0;
@@ -682,19 +593,33 @@ function playAgain(){
         coinAudio.currentTime = 0;
         coinAudio.muted = false;
         coinAudio.play();
-        pause = Math.ceil(4000/points);
+        var sub = points / (coinAudio.duration*10);
     }
-    animateScore(pause);
+    animateScore(sub, points, (overall_score*1+points));
     return false;
 }
-function animateScore(pause) {
-    if (points > 0) {
-        overall_score = overall_score * 1 + 1;
-        points--;
+
+function playClick(){
+    clickAudio.play();
+
+}
+function animateScore(sub, score, finalScore) {
+    if (score > 0) {
+        if((overall_score * 1 + sub) > finalScore){
+            overall_score = finalScore;
+        }else{
+            overall_score = overall_score * 1 + sub;
+        }
+        score-=sub;
+        points = score;
         refreshTotalScore();
-        showPoints();
-        setTimeout(animateScore, pause, pause);
+        if (score > 0) {
+            showPoints();
+        }
+        setTimeout(animateScore, 100, sub, score, finalScore);
     }else{
+        $("#page").hide();
+        $("#splash").show();
         nextGame();
     }
 }
@@ -722,12 +647,24 @@ function getNextSet(){
 }
 
 function surrenderAll(e){
-    for(i=1; i<=10;i++){
+    // playClick();
+//    alert(playedUpTo);
+    document.getElementById("lifeline").disabled = true;
+    if (playedUpTo != -1) Tracks[playedUpTo].stop();
+    pausePlaying=true;
+    for(var i=1; i<=10;i++){
         fields = document.getElementsByName(randomNumber + "~answer_"+i)
 
-        for(j=0;j<fields.length;j++){
+//        $("input:text").prop("disabled", "true");
+        for(var j=0;j<fields.length;j++){
+            if(fields[j].value == Tracks[i-1].answersText[j]){
+                $(fields[j]).css("background", "#9dffc3");
+            }else{
+                $(fields[j]).css("background", "indianred").css("color", "black").css("opacity", "1");
+            }
             fields[j].value = Tracks[i-1].answersText[j];
             fields[j].disabled = true;
+//            $(fields[j]).css("border-radius", "9px").css("color", "beige");
         }
     }
     e.style.display = "none";
@@ -735,6 +672,7 @@ function surrenderAll(e){
     // $("#loser").center().fadeToggle(1000).fadeToggle(500);
     duration = 120000;
     playFull = "true";
+    pausePlaying = true;
     showedPlayAllMessage = "true";
 
 }
@@ -755,20 +693,24 @@ function submitError(){
             f.reasonError.style.background = "pink";
         }
 
-        document.getElementById("songErrorTr").style.display = "none";
         var timeslice = -1;
         if(f.reasonError.value <= 2){
-
-            timeslice = Tracks[bits[0]-1].timeSnippet;
+            if(f.songError.value == -1){
+                f.songError.style.background = "pink";
+                error = "true";
+            }else{
+                timeslice = Tracks[bits[0]-1].timeSnippet;
+            }
         }
+        if(error == "true") return false;
         allDetails = "";
         for (i=0; i<10; i++){
             allDetails += " " + Tracks[i].id + ":" + Tracks[i].timeSnippet;
         }
-        if(error == "true") return false;
         $("#errorResult").load("http://www.oursort.co.za/splitmusicchallenge/ajax.php", { option: "logError", track: bits[1], reason: f.reasonError.value,
                 info: f.errorReason.value, timesnippet: timeslice, detail: allDetails},
             function(){ cleanupErrorDiv() }) ;
+        document.getElementById("songErrorTr").style.display = "none";
     }
     catch (e){
         alert ("Submiterrpr " +e);
@@ -784,8 +726,8 @@ function changeError(i){
     }
     if (i == 2 && f.songError.value == -1) return;
     if (i == 1){
-        if(f.reasonError.value >=0 && f.reasonError.value < 3) {
-            document.getElementById("songErrorTr").style.display = "inline";
+        if(f.reasonError.value >=0 && f.reasonError.value < 4) {
+            document.getElementById("songErrorTr").style.display = "table-row";
         }else{
             document.getElementById("songErrorTr").style.display = "none";
         }
@@ -798,10 +740,14 @@ function changeError(i){
     }
 
 }
+function defaultCallBack(){
+
+}
 function useLifeline(e){
     if(e.value == 0) return true;
+//    alert(playedUpTo);
     if(e.value == 99){
-        alert("You've already used up this life line");
+        messageUser("You've already used up this life line", "", defaultCallBack);
         e.value = 0;
         return;
     }
@@ -812,32 +758,43 @@ function useLifeline(e){
 
         // Play different snippet
     }else if (e.value == 3){
-        deductPoints(500);
+        if(!deductPoints(500)) return;
 
         loadSnippets();
-        e[e.selectedIndex].value = "99";
-        nextSnippet(0);
+        // Remove from the list of lifelines
+        $(e[e.selectedIndex]).remove();
+        if(playedUpTo > 0 && playedUpTo < 10){
+            document.getElementById("row" + (++playedUpTo)).style.background = "";
+        }
+//        nextSnippet(0);
 
         // Play longer snippet
     }else if (e.value == 2){
+        if(!deductPoints(Math.ceil(duration / 25))) return;
         duration = duration * 1 + 500;
-        deductPoints(Math.ceil(duration / 25));
-        if(duration > 2000)
-            e[e.selectedIndex].value = "99";
-        nextSnippet(0);
+        if(duration > 4000){ // Remove from the list of lifelines
+            $(e[e.selectedIndex]).remove();
+        }
+        if(playedUpTo > 0 && playedUpTo < 10){
+            document.getElementById("row" + (++playedUpTo)).style.background = "";
+        }
+//        nextSnippet(0);
     }
     e.selectedIndex = 0;
     return;
 }
 
 function loadSnippets(){
+    console.log("snippy before " + Tracks[0].timeSnippet);
     for(var loopy=0; loopy<10;loopy++) {
-        var e = Tracks[loopy].audio;
+        var e = Tracks[loopy].getAudio();
         random = Math.random();
         var snippy = Math.floor(random * (e.duration - 6)) + 2; // Need to make sure we have enough seconds to play
         Tracks[loopy].timeSnippet = snippy;
+        e.currentTime = snippy;
     }
-
+    console.log("snippy after " + Tracks[0].timeSnippet);
+    
 }
 /**
  * Created by Tim on 3/13/16.
@@ -864,71 +821,70 @@ jQuery.fn.visibilityToggle = function() {
     });
 };
 
+
+function fetchSource(url, idx){
+    var i = idx;
+    prefetch_file(url, function(url) { fetched(url, idx) },
+                  function(pc, idx) { progress(pc, i) }, function(e,idx) { error(e, url) });
+}
 function populatePage(data){
     if(data.substr(0,5) == "ERROR"){
-        alert(data.substr(7));
+        alert("ERROR: " + data.substr(7));
         deleteCookie("decade");
         deleteCookie("genre")
         playAgain();
         // window.location.href = "index.html?rand=" + Math.random();
         return;
     };
-    message(11, (new Date() - startDate)/1000);
-
-
-    var audioText = "";
+    message(12, (new Date() - startDate)/1000);
+    
+    
     var songErrorOptions = "<option value='-1'>Select</option>";
     var selectedRowsValue = "";
     var line = data.split("~~~");
     // message(12, line[10]);
-
+    
     for(var i=0; i<10;i++){
         var music = new Music();
         music.sequence = i;
         var snippetNumber = (i*1+1);
         var bits = line[i].split("~!~");
+        //        addAudioSrcHTML(snippetNumber, mp3Url + bits[1]);
+        //        fetched(mp3Url + bits[1], snippetNumber);
+        //        addAudioHTML(snippetNumber, mp3Url + bits[1]);
+        //        document.getElementById("loadSnip" + snippetNumber).src = bits[1];
+        
         music.trackId = bits[0];
         music.fileName = bits[1];
+        music.id = "loadSnip" + snippetNumber;
+        
         music.songName = bits[2];
         music.artist = bits[3];
-        music.id = "loadSnip" + snippetNumber;
-
-        var audioE = document.createElement("audio");
-        // $(audioE).bind("canplaythrough", function() { alert(this.src) });
-        audioE.setAttribute("src", mp3Url +music.fileName);
-        audioE.setAttribute("type", "audio/mpeg; codecs=mp3");
-        audioE.setAttribute("id", "loadSnip" + snippetNumber);
-        audioE.setAttribute("controls", true);
-        audioE.setAttribute("preload", "auto");
-        audioE.load();
-        audioE.muted = true;
-        document.getElementById("audioElements").appendChild(audioE);
-
+        var random = Math.random();
+        var snippy = Math.floor(random * 55); // Need to make sure we have enough seconds to play
+        music.timeSnippet = snippy;
+        if(bits[2].toUpperCase().indexOf("BONUS") >= 0){
+            music.fileName = "res/Coins.mp3";
+            music.timeSnippet = 0;
+        }
+        music.audio = document.getElementById(music.id);
         songErrorOptions += "<option value='" + snippetNumber + "_" + music.trackId + "'>" + snippetNumber + "</option>";
-
+        
         Load[i] = music;
-        // message((i*1+1), "<a href='" + mp3Url + music.fileName +"' target='new'>" + music.fileName + "</a>");
-        message((i*1+1), music.fileName);
-        // message(snippetNumber,"");
-        setTimeout(setSnippet, 1000, i, 0);
-
-    }
-    for(var i=0; i<10;i++) {
-        var music = Load[i];
+        increasePercent(i,5,100);
+        message(snippetNumber, "loaded Load");
         populateLoadMusicList(i, music);
         layoutAnswerGrid(i, music);
         selectedRowsValue +=  music.trackId +  " ";
+        
     }
-    // selectedRowsValue += "0)";
-    // document.forms[0].selectedRows.value = selectedRowsValue;
-    // $("#ajaxResult").load("http://www.oursort.co.za/splitmusicchallenge/ajax.php", { option: "updateSelected", tracks: selectedRowsValue},
-    //     function(){  }) ;
-
+    fetchSources(0);
     $("#songError").html(songErrorOptions);
     $("#splash").hide();
     $("#page").show();
-
+    
 }
+
 
 function layoutAnswerGrid(i, track){
     var pad = 2;
@@ -936,6 +892,9 @@ function layoutAnswerGrid(i, track){
     var showValue = false;
     var value = "";
     var index = (i*1+1);
+    increasePercent(i,5,100);
+    message(index, "answer grid");
+    
     if(bits[0] == "Bonus") {
         showValue = true;
 //        addPoints(1000);
@@ -944,8 +903,8 @@ function layoutAnswerGrid(i, track){
         var newInput = document.createElement("input");
         newInput.setAttribute("type", "text");
         newInput.setAttribute("class", "track");
-        // newInput.setAttribute("size", (bits[ii].length*1+pad) + "em");
         $(newInput).css("font", font);
+        $(newInput).css("fontSize", fontSize+"pt");
         $(newInput).css("width", getWidthOfText(bits[ii]));
         if(showValue) {
             newInput.setAttribute("value", bits[ii]);
@@ -972,6 +931,7 @@ function layoutAnswerGrid(i, track){
         if(bits[ii].trim().toUpperCase() == "AND" || bits[ii].trim() == "&"){
             newInput.setAttribute("value", "&");
             newInput.setAttribute("disabled", "true");
+            bits[ii] = "&";
         }
         newInput.setAttribute("name", randomNumber + "_answer_" + index);
         newInput.onkeyup = function(event){ checkSong(this, event) };
@@ -988,13 +948,29 @@ function populateLoadMusicList(i, music){
 function tilt(x){
     alert(x + " " + y);
 }
+
+function noInternet(){
+    handleViewport();
+    $("#splash").hide();
+
+    $("#connection").center();
+    $("#connection").show();
+    document.addEventListener('touchstart', handleTouchStart, false);
+    document.addEventListener('touchmove', handleTouchMove, false);
+
+}
 function setUp(){
     var viewport = handleViewport();
 
-    $("#page").hide();
     $("#splash").center();
-    if(!test) $(".buttonInfo").css("visibility", "hidden");
+    $("#splash").css("position", "absolute").css("top", "20px").css("bottom", "20px");
+    if(!TEST) $(".buttonInfo").css("visibility", "hidden");
     $("#splash").show();
+    $("#runIntro3").css("right", "8em");
+    $("#runIntro4").css("top", "5.5em").css("right", "7em");
+    $("#runIntro5").css("top", "7em").css("right", "7em");
+    $("#runIntro6").center();
+    
     // document.getElementById("splash").style.display = "block";
     getGenre();
     getDecade();
@@ -1005,12 +981,16 @@ function setUp(){
         beenWarned = "false";
     }
 
+//    introRun = getCookie("intro_run");
+//    if (introRun == ""){
+//        introRun = "false";
+//    }
+    
     overall_score = getTotalPoints();
 
     refreshTotalScore();
     showPoints();
 
-    runIntro();
 
 //    $("#reportMistake").click(function(){
 //        $("#reportProblem").center().fadeIn(1000);
@@ -1026,7 +1006,9 @@ function setUp(){
 }
 
 function Music() {
-    this.timeSnippet = "";
+    this.sequence = "";
+    this.source = "";
+    this.timeSnippet = 0;
     this.answersText = [];
     this.inputSong = [];
     this.inputArtist = [];
@@ -1036,36 +1018,57 @@ function Music() {
     this.artist = "";
     this.score = 0;
     this.audio = "";
-    this.percent = 10;
+    this.percent = 0;
     this.history = "";
+    this.audio;
+    this.canPlay = 0;
+    this.bufferEmpty = 0;
+    this.resetCount = 0;
+    this.fetching = 0;
     this.addHistory = function(h){
-        this.history += "\n" + h.replace(/\"/,"");
+        this.history += "\n" + h.replace(/'"'/,"").replace(/"'"/,"");
     }
 
     this.getAudio = function() {
         return document.getElementById(this.id);
     }
     this.play = function(){
-        this.audio = document.getElementById(this.id);
-        this.audio.currentTime = this.timeSnippet;
-        this.audio.muted = false;
-        this.audio.play();
+        try{
+            this.getAudio().muted = false;
+        this.getAudio().play();
+        }catch(e){
+            console.log("play error " + e);
+        }
     }
     this.stop = function(){
-        this.audio = document.getElementById(this.id);
-        this.audio.pause();
-        this.audio.currentTime = this.timeSnippet;
-        this.audio.muted = true;
+        this.getAudio().pause();
+        this.getAudio().currentTime = this.timeSnippet;
     }
     this.playFull = function(){
-        this.audio = document.getElementById(this.id);
-        this.audio.currentTime = 0;
-        this.audio.play();
-        this.audio.muted = false;
+        var obj = this.getAudio();
+        obj = document.getElementById(this.id);
+        obj.currentTime = 0;
+        obj.play();
+    }
+    this.showAudioDetails = function(obj) {
+        console.log("currentSrc " + obj.currentSrc);
+        console.log("ended " + obj.ended);
+        console.log("error " + obj.error);
+        console.log("muted " + obj.muted);
+        console.log("networkState " + obj.networkState);
+        console.log("paused " + obj.paused);
+        console.log("buffered " + obj.buffered.start(0) + " - " + obj.buffered.end(0));
+        console.log("played " + obj.played.length);
+        console.log("readyState " + obj.readyState);
+        console.log("seeking " + obj.seeking);
+        console.log("currentTime " + obj.currentTime);
+        console.log("duration " + obj.duration);
     }
 }
 function showOptions(){
-    $( "#options" ).toggle("slide", {direction:"right"}, "fast")
+    DISABLESWIPE = !DISABLESWIPE;
+    pausePlaying = !pausePlaying;
+    $( "#options" ).toggle("slide", {direction:"right"}, "fast");
 }
 function showAbout(){
     $( "#options" ).toggle("slide", {direction:"right"}, "fast")
@@ -1077,7 +1080,7 @@ function showReport(){
 }
 
 function cleanupErrorDiv(){
-    $( "#options" ).toggle("slide", {direction:"right"}, "slow")
+//    $( "#options" ).toggle("slide", {direction:"right"}, "slow")
     $( "#reportProblem" ).toggle("slide", {direction:"left"}, "slow")
     f.songError.value = "-1";
     f.reasonError.value = "-1";
@@ -1090,10 +1093,14 @@ function cleanupAboutDiv(){
 }
 
 function runIntro(){
-    if(introRun) return true;
-    $(".runintro1").show();
+    if(introRun == "true") return true;
+    $("#runIntro1").css("display", "table-row");
+    $("button").attr("disabled", "true");
+    $("select").attr("disabled", "true");
+    $("input").attr("readonly", "true");
     var classes = document.getElementsByClassName("trackTD");
     flicker(classes,0);
+    return false;
 
 }
 function flicker(c,i){
@@ -1156,11 +1163,12 @@ function getWidthOfText(text) {
     // alert(text)
     var tmp = document.createElement("span");
     tmp.className = "input-element tmp-element";
-    $(tmp).css("font", font);
+    $(tmp).css("font", fontSize + "pt Lucida Console");
     $(tmp).css("visibility", "hidden");
     tmp.innerHTML = text;
     document.body.appendChild(tmp);
     var theWidth = Math.ceil(tmp.getBoundingClientRect().width);
+    message(13, " width " + theWidth + " " + text + " " + fontSize);
     document.body.removeChild(tmp);
     return theWidth + "px";
 }
@@ -1174,6 +1182,8 @@ function handleTouchStart(evt) {
 };
 
 function handleTouchMove(evt) {
+    if(DISABLESWIPE)
+        return;
     if ( ! xDown || ! yDown ) {
         return;
     }
@@ -1185,23 +1195,16 @@ function handleTouchMove(evt) {
     var yDiff = yDown - yUp;
 
     if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {/*most significant*/
-        if ( xDiff > 0 ) {
-            biggerFont(0);
-            // alert("l");
-            /* left swipe */
-        } else {
-            smallerFont(0);
-            // alert("r");
-            /* right swipe */
+        if ( xDiff > 4 ) {
+            biggerFont();
+        } else if ( xDiff < -4) {
+            smallerFont();
         }
     } else {
         if ( yDiff > 4 ) {
             swipePause();
-            // alert("d");
-            /* up swipe */
         } else if ( yDiff < -4 ){
             swipePlay();
-            /* down swipe */
         }
     }
     /* reset values */
@@ -1210,74 +1213,469 @@ function handleTouchMove(evt) {
 };
 
 function swipePause(){
-    if(!playInProgress) return;
-    abortSong = true;
+    if(typeof(fieldWithFocus) != "undefined") fieldWithFocus.blur();
+    if(!playInProgress || playedUpTo == 10) return;
+    pausePlaying = true;
+    $("#pause").css("opacity", 0.0);
+    $("#pause").css("display", "block");
+    
     evolve(document.getElementById("pause"), 0);
+    if(introRun == "false"){
+        $("#runIntro6").hide();
+        setTimeout(slideSwipebox, 2000, 2);
+    }
 }
 function swipePlay(){
-    // evolve(document.getElementById("resume"), 0);
-    if(document.getElementById("pause").style.display == "none") return;
-    disolve(document.getElementById("pause"), 0.8);
+
+    if(typeof(fieldWithFocus) != "undefined"){
+        fieldWithFocus.blur();
+    }
+    if(fieldWithFocus){
+        fieldWithFocus.blur();
+    }
+    // If no internet connection, swipe reloads the game
+    if(typeof (Tracks[0]) == "undefined"){
+        // console.log("replay");
+        playAgain();
+        return false;
+    }
+
+    if(playInProgress || showedPlayAllMessage == "true") return;
+//    message(12, document.getElementById("pause").style.display);
+    if(document.getElementById("pause").style.display != "none") {
+        // message(11, document.getElementById("pause").style.display);
+        disolve(document.getElementById("pause"), 1);
+    }
+    if(introRun == "false"){
+        $("#runIntro6").hide();
+        setTimeout(slideSwipebox, 3000, 1);
+    }
     replayFull();
 }
 
 function disolve(ele, opac){
-    ele.style.display = "inline";
+    // ele.style.display = "inline";
+    $(ele).css("zIndex", 0);
+
+//    $("#page").css("opacity", 1);
     if(opac > 0){
-        opac -= 0.10;
+        opac -= 0.20;
         ele.style.opacity = opac;
+        $("#page").css("opacity", (1-opac));
         setTimeout(disolve, 100, ele, opac);
         return;
     }
-    ele.style.display = "none";
+    $(ele).css("display", "none");
 }
 function evolve(ele, opac){
-    ele.style.display = "inline";
-    if(opac < 0.8){
+    if(opac < 1){
         opac += 0.10;
         ele.style.opacity = opac;
+        $("#page").css("opacity", (1-opac));
         setTimeout(evolve, 100, ele, opac);
         return;
     }
-    // disolve(ele,1);
+//    $(ele).css("zIndex", -1);
+//    $(ele).css("display", "none");
+    //    $("#page").css("opacity", 0.7);
+     setTimeout(disolve,1000,ele,1);
 }
 function biggerFont(){
-    if(fontSize == "15pt") return;
-    fontSize = fontSize.replace("pt", "")*1+1;
+    if(fontSize == "15") return;
+    fontSize = fontSize*1+1;
+//    font = fontSize;
+    adjustInputSizes();
     handleViewport(fontSize);
+    $("#page").center();
+    if(introRun == "false"){
+        $("#runIntro6").hide();
+        setTimeout(slideSwipebox, 1000, 3);
+    }
+    
 }
 function smallerFont(){
-    if(fontSize == "6pt") return;
-    fontSize = fontSize.replace("pt", "")*1-1;
+    if(fontSize == "6") return;
+    fontSize = fontSize*1-1;
+    font = fontSize;
+    adjustInputSizes();
     handleViewport(fontSize);
+    $("#page").center();
+    if(introRun == "false"){
+        $("#runIntro6").hide();
+        setTimeout(slideSwipebox, 1000, 4);
+    }
 }
 
+function shareToTwitter(){
+    var storeRank = rank;
+    getRank(points * 1 + overall_score * 1);
+    var message = "Can you recognise a song in just a couple of seconds? Play the Split Music Challenge and find out.";
+
+    if (rank != storeRank) {
+        message = "I've reached the level of " + rank + " on the Split Music Challenge!"
+    } else if (points > highScore) {
+        message = "I'v reached a personal new best on the Split Music Challenge! " + points + " points."
+    }
+
+    alert(message);
+    open("https://twitter.com/home?status=" + message +
+        "%26url=http%3A//www.oursort.co.za/splitmusicchallenge/index.html");
+
+}
 function shareToFaceBook(){
+    // Method 1
+//    alert(window.plugins);
+//    window.plugins.socialsharing.share('Message, subject, image and link', 'The subject', 'https://www.google.nl/images/srpr/logo4w.png', 'http://www.x-services.nl');
+//
+//    return;
+    
+    // Method 2
     try {
+//       FB.ui({
+//           method: 'feed',
+//           name: title,
+////           link: 'http://www.oursort.co.za/splitmusicchallenge/index.html',
+//             link: 'za.co.oursort.splitmusicchallenge',
+//           picture: 'http://www.oursort.co.za/splitmusicchallenge/img/musicimage2.jpg',
+//           caption: 'Split Music Challenge',
+//           description: "message"
+//       });
+//        return;
+    
+    // Method 3
+//        open("https://www.facebook.com/sharer/sharer.php?u=http://www.oursort.co.za/splitmusicchallenge/index.html");
+//              // https://www.facebook.com/sharer/sharer.php?u=http://www.oursort.co.za/splitmusicchallenge/index.html
+//        return;
+//    
+//        // Method 4
+//        open("https://www.facebook.com/dialog/share?app_id=1725168737759736&display=popup&href=http://www.oursort.co.za/splitmusicchallenge/index.html&redirect_uri=splitmusicchallenge:");
+//        
+//        return;
+        
+        // Method 5
+        FB.login(function(response){ alert("response: " + response.status)});
+        return;
+        
+        
         var storeRank = rank;
         getRank(points * 1 + overall_score * 1);
-        var message = "Can you recognise a song in just a couple of seconds? Play the Split Blits Music Challenge and find out.";
-        var title = 'Split Blits Impossible Music Challenge.'
+        var message = "Can you recognise a song in just a couple of seconds? Play the Split Music Challenge and find out.";
+        var title = 'Split Music Challenge.'
 
         if (rank != storeRank) {
-            message = "Congratulations, you've reached the level of " + rank + " on the Split Blitz Music Challenge!"
+            message = "Congratulations, you've reached the level of " + rank + " on the Split Music Challenge!"
             title = "Promoted to level: " + rank;
         } else if (points > highScore) {
-            message = "Congratulations! Youv'e reached a personal new best on the Split Blits Music Challenge! " + points + " points."
+            message = "Congratulations! Youv'e reached a personal new best on the Split Music Challenge! " + points + " points."
             title = "Personal new best :" + points;
         }
 
 
-        FB.ui({
-            method: 'feed',
-            name: title,
-            link: 'http://www.oursort.co.za/splitmusicchallenge/index.html',
-            picture: 'http://www.oursort.co.za/splitmusicchallenge/img/musicimage2.jpg',
-            caption: 'Split Blits Music Challenge',
-            description: message
-        });
+//        window.plugins.socialsharing.share('Message only')
+                                         
         addPoints(500);
     }catch (e){
-        alert("Error " + e);
+        alert("share to FB Error " + e);
     }
+}
+
+function adjustInputSizes(){
+    e = document.getElementsByTagName("input");
+    var row = 0;
+    var saveRow = 0;
+    var field = -1;
+    for(var i=0; i<e.length; i++){
+        if(e[i].name.indexOf("answer") <= 0) continue;
+        row = (e[i].name.split("_")[1])-1;
+        if(row != saveRow) field = -1;
+        field++;
+        saveRow = row;
+//        e[i].style.fontSize = fontSize;
+        $(e[i]).css("width", getWidthOfText(Tracks[row].answersText[field]));
+    }
+}
+
+                                         
+
+function messageUser(message, cancel, callBack, parm){
+    $("#alertsMessage").html(message);
+    var cancelButton = "";
+    if(cancel != ""){
+        cancelButton = "<button class='alerts' type='button' onClick='returnInput(false, " + callBack +  ", " + parm + ")'>" + cancel + "</button>";
+    }
+    var okayButton = "<button class='alerts' type='button' onClick='returnInput(true, " + callBack + ", " + parm + ")'>Okay</button>";
+    $("#alertsButtons").html(cancelButton + "&nbsp;&nbsp;" + okayButton);
+    $("#alerts").center();
+    //    $(".alerts, #alerts").show();
+    $("#alerts").show();
+    
+}
+function returnInput(response, callBack, parm){
+    $("#alerts").hide();
+    callBack(response, parm);
+
+}
+
+
+function message(r, mess){
+    try {
+
+        var fullmess = "";
+        
+        var now = new Date();
+        var lapsed = ((now - startDate)/1000);
+        lapsed = Math.floor(lapsed);
+        var loading = "Loading...";
+        if (TEST || r > 10) {
+//            if(lapsed > 20 && r<=10){
+//                mess = "<a target=_new href='mp3/" + Load[r-1].fileName + "'>"+Load[r-1].fileName+"</a>";
+//            }
+          $("#info" + r).html(r + "<input type='text' class='info' size=1 value='" + r + "' style='visibility:hidden;font:" + font + "'/> " +
+                              "<div class='progress'>" + mess + "</div>");
+        }else{
+          Load[r - 1].addHistory(mess);
+          // console.log(mess);
+          fullmess = Load[r - 1].history;
+          
+        var perc = Load[r - 1].percent;
+        if(lapsed > 1){
+            if(lapsed > 10 && lapsed % 2 == 0){
+                loading = "Slow connection ";
+            }else {
+                loading = "&nbsp;&nbsp;&nbsp;&nbsp;Loading...&nbsp;&nbsp;&nbsp;";
+            }
+        }
+            if(lapsed > 30){
+                loading = "<a target=_new href='mp3/" + Load[r-1].fileName + "'>"+Load[r-1].fileName+"</a>";
+            }
+                // loading = lapsed;
+          var inside = "<table style='width:100%'><tr><td onclick='alert(\"" + fullmess + "\")' style='width:" + perc +
+          "%;background:indianred;text-align:center; display:block; overflow:hidden;white-space:nowrap'>" + loading +
+          // "%;background:#455e9c;text-align:center'>" +
+          "</td><td>&nbsp</td></tr></table>";
+          $("#info" + r).html(inside);
+          // if (perc < 90) {
+          //     Load[r - 1].percent = perc * 1 + 10;
+          // }
+          // alert("");
+        }
+    }catch(e){
+          alert("Error : " + e  + " r = " + r + " mess = " + mess);
+          }
+          
+}
+
+function prefetch_file(url,
+                       fetched_callback,
+                       progress_callback,
+                       error_callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.responseType = "blob";
+    
+    xhr.addEventListener("load", function () {
+                         if (xhr.status === 200) {
+                            var URL = window.URL || window.webkitURL;
+                            var blob_url = URL.createObjectURL(xhr.response);
+                            fetched_callback(blob_url);
+                         } else {
+                            error_callback(xhr.status, url);
+                         }
+                         }, false);
+    
+    var prev_pc = 0;
+    xhr.addEventListener("progress", function(event) {
+                         if (event.lengthComputable) {
+                            var pc = Math.round((event.loaded / event.total) * 100);
+                            if (pc != prev_pc) {
+                                prev_pc = pc;
+                                progress_callback(pc);
+                            }
+                         }
+                         });
+    xhr.send();
+}
+
+function checkIfCanPlayTriggered(idx){
+    if(numberReady[idx] != 1){
+        alert("Can play not triggered yet " + idx + " " + document.getElementById("loadSnip" + idx).buffered.length);
+//        resetSrc(Load[idx].audio);
+    }
+}
+//function fetched(url, idx){
+//    var e = document.getElementById("loadSnip" + idx)
+//    console.log(idx + " fetched " + url);
+//    e.src = url;
+////    $(e).bind("canplaythrough", function(){setCanPlay(this) });
+//    $(e).bind("waiting", function(){waiting(this) });
+//    $(e).bind("stalled", function(){stalled(this) });
+//    e.load();
+//    setTimeout(checkIfCanPlayTriggered, 5000, idx-1);
+//    //    setCanPlay(e);
+//}
+//function waiting(el){
+//    console.log("waiting " + e.id);
+//    message(12, e.id + " waiting");
+//}
+//function stalled(el){
+//    console.log("stalled " + e.id);
+//    message(12, e.id + " stalled");
+//}
+function error(e, url){
+    alert("prefetch error " + url);
+}
+function progress(pc, idx){
+    console.log(idx + " = " + pc);
+}
+
+var source1;
+var source2;
+function BufferLoader(context, urlList, callback) {
+    this.context = context;
+    this.urlList = urlList;
+    this.onload = callback;
+    this.bufferList = new Array();
+    this.loadCount = 0;
+}
+
+BufferLoader.prototype.loadBuffer = function(url, index) {
+    // Load buffer asynchronously
+    var request = new XMLHttpRequest();
+    request.open("GET", url, true);
+    request.responseType = "arraybuffer";
+    
+    var loader = this;
+    
+    request.onload = function() {
+        // Asynchronously decode the audio file data in request.response
+        loader.context.decodeAudioData(
+                                       request.response,
+                                       function(buffer) {
+                                       if (!buffer) {
+                                       alert('error decoding file data: ' + url);
+                                       return;
+                                       }
+                                       loader.bufferList[index] = buffer;
+                                       if (++loader.loadCount == loader.urlList.length)
+                                       loader.onload(loader.bufferList);
+                                       },
+                                       function(error) {
+                                       console.error('request.onload: decodeAudioData error', error);
+                                       }
+                                       );
+    }
+    
+    request.onerror = function() {
+        alert('BufferLoader: XHR error');
+    }
+    
+    request.send();
+}
+
+BufferLoader.prototype.load = function() {
+    for (var i = 0; i < this.urlList.length; ++i)
+        this.loadBuffer(this.urlList[i], i);
+}
+
+
+function createAudios(i) {
+    // Fix up prefixing
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    context = new AudioContext();
+    
+    var bufferLoader = new BufferLoader(
+                                    context,
+                                    [
+                                     Load[i].fileName,
+                                     ],
+                                    function() {finishedLoading(bufferList,i)}
+                                    );
+//    console.log("loading buffer");
+    bufferLoader.load();
+}
+
+function finishedLoading(bufferList, i) {
+//    console.log("finishedLoading " + i);
+    return;
+    // Create two sources and play them both together.
+    for(var i=0; i<1; i++){
+        Load[i].source = context.createBufferSource();
+        Load[i].source.buffer = bufferList[i];
+        Load[i].source.connect(context.destination);
+    }
+//    console.log("loaded");
+    Load[0].source.start(0,30, 5);
+}
+
+
+function nextBubble(i, skip){
+    playClick();
+    if(typeof(skip) == "undefined"){
+    switch (i){
+            // Use individual buttons to replay a snippet.
+        case 1: replay(3);
+            break;
+        case 2:
+            f.lifeline.click();
+            break;
+        case 3:
+            break;
+        case 4:
+            break;
+        case 5:
+            f.genre.size = 0;
+            if(isMobileDevice){
+                DISABLESWIPE = false;
+                // Listen for swipe to replay
+                document.removeEventListener('touchstart', handleTouchStart, false);
+                document.removeEventListener('touchmove', handleTouchMove, false);
+                document.addEventListener('touchstart', handleTouchStart, false);
+                document.addEventListener('touchmove', handleTouchMove, false);
+                slideSwipebox(0);
+                break;
+            }
+        case 6:
+            $("input").removeAttr("readonly");
+            $("select").removeAttr("disabled");
+            $("#runIntro" +i).hide();
+            introRun = "true";
+            addCookie("intro_run", "true");
+            nextSnippet(0);
+            return;
+            break;
+    }
+    }
+    $("#runIntro" +i).hide();
+    i++;
+    $("#runIntro" +i).css("display", "block");
+    message(13, "runintro" + i);
+}
+
+function slideSwipebox(count){
+    $("#runIntro6").show();
+    switch (count){
+        case 0: // Swipe down to resume play
+            $("#endHints").html("")
+            $("#swipeHint").html("Swipe down to resume play<br>");
+            break;
+        case 1: // Swipe up
+            $("#swipeHint").html("Swipe up to pause play<br>");
+            break;
+        case 2: // Left
+            $("#swipeHint").html("Swipe left to increase font<br>");
+            break;
+        case 3: // Right
+            $("#swipeHint").html("Swipe Right to decrease font<br>");
+            break;
+        case 4: // Finished
+            $("#swipeHint").html("Walkthrough Complete.");
+            $("#endHints").html("Begin");
+            introRun = "true";
+            break;
+    }
+}
+function walkThrough(){
+    $( "#options" ).toggle("slide", {direction:"right"}, "fast");
+    introRun="false";
+    runIntro();
 }

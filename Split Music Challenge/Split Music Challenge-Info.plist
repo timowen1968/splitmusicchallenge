@@ -9,13 +9,13 @@
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIconFile</key>
-	<string>icon.png</string>
+	<string>icon.jpg</string>
 	<key>CFBundleIcons</key>
 	<dict/>
 	<key>CFBundleIcons~ipad</key>
 	<dict/>
 	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<string>za.co.oursort.splitmusicchallenge</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -26,23 +26,10 @@
 	<string>1.0.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>fb1725168737759736</string>
-			</array>
-		</dict>
-	</array>
-	<key>CFBundleVersion</key>
-	<string>1.0.0</string>
-	<key>FacebookAppID</key>
-	<string>1725168737759736</string>
-	<key>FacebookDisplayName</key>
-	<string>Split Music Challenge</string>
 	<key>KeyboardDisplayRequiresUserAction</key>
 	<false/>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>fbapi</string>
@@ -58,44 +45,44 @@
 		<true/>
 		<key>NSExceptionDomains</key>
 		<dict>
-			<key>//</key>
-			<dict>
-				<key>NSIncludesSubdomains</key>
-				<true/>
-			</dict>
+			<key>*</key>
+			<true/>
+			<key>*.facebook.com</key>
+			<true/>
 			<key>akamaihd.net</key>
-			<dict>
-				<key>NSIncludesSubdomains</key>
-				<true/>
-			</dict>
+			<true/>
 			<key>api.facebook.com</key>
-			<dict/>
+			<true/>
+			<key>connect.facebook.net</key>
+			<true/>
+			<key>facebook-jssdk</key>
+			<true/>
 			<key>fbcdn.net</key>
-			<dict>
-				<key>NSIncludesSubdomains</key>
-				<true/>
-			</dict>
+			<true/>
 			<key>graph.facebook.com</key>
-			<dict/>
+			<true/>
 			<key>m.facebook.com</key>
-			<dict/>
+			<true/>
 			<key>staticxx.facebook.com</key>
-			<dict>
-				<key>NSIncludesSubdomains</key>
-				<true/>
-			</dict>
+			<true/>
+			<key>twitter.com</key>
+			<true/>
+			<key>www.oursort.co.za</key>
+			<true/>
 		</dict>
 	</dict>
 	<key>NSMainNibFile~ipad</key>
 	<string></string>
 	<key>UIRequiresFullScreen</key>
 	<true/>
+	<key>UIStatusBarHidden</key>
+	<true/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
 	<key>shouldAutorotateToInterfaceOrientation</key>
 	<true/>

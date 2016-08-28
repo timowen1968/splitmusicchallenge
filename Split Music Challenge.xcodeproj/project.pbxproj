@@ -16,7 +16,6 @@
 		302D95F114D2391D003F00A1 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 302D95EF14D2391D003F00A1 /* MainViewController.m */; };
 		302D95F214D2391D003F00A1 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 302D95F014D2391D003F00A1 /* MainViewController.xib */; };
 		37AABC0DFAED41F9A32B6F54 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33F57D9A28A745AB9581462E /* Security.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		42ADAD4CFEEF410885CD48BD /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42AD988308BE4C4FB57B5EA3 /* Social.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		DB60B8B01C244441935E93DB /* Accounts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 400924BD66E4408390CF1E4F /* Accounts.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
@@ -55,10 +54,8 @@
 		32CA4F630368D1EE00C91783 /* Split Music Challenge-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Split Music Challenge-Prefix.pch"; sourceTree = "<group>"; };
 		33F57D9A28A745AB9581462E /* Security.framework */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		400924BD66E4408390CF1E4F /* Accounts.framework */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.framework; name = Accounts.framework; path = System/Library/Frameworks/Accounts.framework; sourceTree = SDKROOT; };
-		42AD988308BE4C4FB57B5EA3 /* Social.framework */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
 		8D1107310486CEB800E47090 /* Split Music Challenge-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Split Music Challenge-Info.plist"; path = "Split Music Challenge/Split Music Challenge-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = SOURCE_ROOT; };
 		971736241A1742FE8D3E2DE0 /* CDVLogger.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = CDVLogger.h; path = "cordova-plugin-console/CDVLogger.h"; sourceTree = "<group>"; };
-		EB87FDF31871DA8E0020F90C /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = ../../www; sourceTree = "<group>"; };
 		EB87FDF41871DAF40020F90C /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = config.xml; path = ../../config.xml; sourceTree = "<group>"; };
 		ED33DF2A687741AEAF9F8254 /* Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
 		F74A505AB8874E49BADA493A /* CDVLogger.m */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.objc; name = CDVLogger.m; path = "cordova-plugin-console/CDVLogger.m"; sourceTree = "<group>"; };
@@ -71,7 +68,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				301BF552109A68D80062928A /* libCordova.a in Frameworks */,
-				42ADAD4CFEEF410885CD48BD /* Social.framework in Frameworks */,
 				22FABB6C1CCAB72700976480 /* StoreKit.framework in Frameworks */,
 				DB60B8B01C244441935E93DB /* Accounts.framework in Frameworks */,
 				37AABC0DFAED41F9A32B6F54 /* Security.framework in Frameworks */,
@@ -106,7 +102,6 @@
 			isa = PBXGroup;
 			children = (
 				EB87FDF41871DAF40020F90C /* config.xml */,
-				EB87FDF31871DA8E0020F90C /* www */,
 				EB87FDF11871DA420020F90C /* Staging */,
 				301BF52D109A57CC0062928A /* CordovaLib.xcodeproj */,
 				080E96DDFE201D6D7F000001 /* Classes */,
@@ -145,7 +140,6 @@
 			isa = PBXGroup;
 			children = (
 				22FABB6B1CCAB72700976480 /* StoreKit.framework */,
-				42AD988308BE4C4FB57B5EA3 /* Social.framework */,
 				400924BD66E4408390CF1E4F /* Accounts.framework */,
 				33F57D9A28A745AB9581462E /* Security.framework */,
 			);
@@ -348,7 +342,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = za.co.oursort.splitmusicchallenge;
 				PRODUCT_NAME = "Split Music Challenge";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "2b295ef0-048f-477a-ab82-1b21e1121c29";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -383,7 +377,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				PRODUCT_BUNDLE_IDENTIFIER = za.co.oursort.splitmusicchallenge;
 				PRODUCT_NAME = "Split Music Challenge";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "2b295ef0-048f-477a-ab82-1b21e1121c29";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
