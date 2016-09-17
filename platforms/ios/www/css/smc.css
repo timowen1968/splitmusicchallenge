@@ -86,11 +86,16 @@ input, span {
     /*font-size:10px;*/
 }
 INPUT:disabled{
-    font: 12pt Lucida Console;
+/*    font: 12pt Lucida Console;*/
+    color:black;
     background: #9dffc3;
     border-radius:9px;
     opacity:1;
+    -webkit-text-fill-color:black; /* Override iOS / Android font color change */
+    -webkit-opacity:1; /* Override iOS opacity change affecting text & background color */
+    color:black;
 }
+
 .info{
     /*    border:none;*/
     border:none;
@@ -244,20 +249,7 @@ p {
 
 
 }
-/*.buttonTrack:hover{*/
-/*    background: #99ccff;*/
-/*    color:black;*/
-/*}*/
-/*.trackTD:hover{*/
-    /*width:20px;*/
-    /*text-align: center;*/
-    /*!*background:url('../img/lightgreenplay.gif');*!*/
-    /*background-size:20px;*/
-    /*background-repeat:no-repeat;*/
-/*}*/
 .buttonTrack{
-/*    border: 2px outset #9dffc3;*/
-/*    border-radius:10px;*/
     width:20px;
     height:20px;
     line-height: 15px;
@@ -267,14 +259,9 @@ p {
     align-content: center;
     child-align: center;
     margin:auto;
-    /*color:black;*/
     color: #99ccff;
     font-weight:bold;
-/*    font-size: 14px;*/
     vertical-align: middle;
-    /*background: #99ccff;*/
-/*    background:inherit;*/
-
     background:-webkit-gradient(linear, 0 0, 0 100%, from(#2e88c4), to(#075698));
     background:-moz-linear-gradient(#2e88c4, #075698);
     background:-o-linear-gradient(#2e88c4, #075698);
@@ -354,4 +341,15 @@ IMG.fb, IMG.twitter {
         -webkit-border-radius:10px;
         -moz-border-radius:10px;
         border-radius:10px;
+}
+
+button#optionsImg {
+    background: url("../img/optionsblueonblack.jpg") no-repeat scroll 0 0 transparent;
+    background-size: 35px 15px;
+    cursor: pointer;
+    height: 15px;
+    width: 30px;
+    border:none;
+    position:relative;
+    right:0px;
 }

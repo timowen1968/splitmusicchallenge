@@ -1,4 +1,6 @@
 // Platform: ios
+alert("i");
+alert("cordova");
 // 2fd4bcb84048415922d13d80d35b8d1668e8e150
 /*
  Licensed to the Apache Software Foundation (ASF) under one

@@ -342,7 +342,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = za.co.oursort.splitmusicchallenge;
 				PRODUCT_NAME = "Split Music Challenge";
-				PROVISIONING_PROFILE = "2b295ef0-048f-477a-ab82-1b21e1121c29";
+				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -377,7 +377,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				PRODUCT_BUNDLE_IDENTIFIER = za.co.oursort.splitmusicchallenge;
 				PRODUCT_NAME = "Split Music Challenge";
-				PROVISIONING_PROFILE = "2b295ef0-048f-477a-ab82-1b21e1121c29";
+				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

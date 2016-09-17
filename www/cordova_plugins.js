@@ -1,3 +1,5 @@
+
+alert("cordove_plugins.js");
 cordova.define('cordova/plugin_list', function(require, exports, module) {
 module.exports = [
     {

@@ -73,6 +73,18 @@ function testConnection(){
     }
     
 }
+document.addEventListener("deviceready", deviceIsReady, false);
+
+function deviceIsReady(){
+    alert("deviceisready");
+    console.log("console.log works well");
+//    IAP.initialize();
+    IAP.load();
+//    renderIAPs(document.getElementById("in-app-purchase-list"));
+    alert("end");
+    alert(window.plugin + " " + window.plugins + " " + window.storekit);
+    
+}
 $(document).ready(function(){
 //    $("#page").hide();
 
@@ -80,6 +92,13 @@ $(document).ready(function(){
     
     isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
 
+                  
+                  
+                  
+                  return;
+                  
+                  
+                  
     if(!isMobileDevice){
         $("#fontTR").show();
         CONCURRENTLIMIT = 99;
@@ -283,6 +302,8 @@ function checkSong(e, ev){
 
     // If a key was pressed but the field was empty and is still empty, presume backspace was pressed
     if(e.value == "" && (typeof(e.oldvalue) == "undefined" || e.oldvalue == "")){
+        var focusField = "";
+        $("#backicon").hide();
 
         var foundNext = false;
         // If user presses backspace at beginning of row, check previous rows for field to focus on
@@ -291,7 +312,8 @@ function checkSong(e, ev){
                 var ess = document.getElementById("row" + jj).getElementsByTagName("input");
                 for(var i=ess.length-1; i>=0; i--){
                     if(ess[i].disabled == false) {
-                        $(ess[i]).focus();
+//                        $(ess[i]).focus();
+                        focusField = ess[i];
                         foundNext = true;
                         break;
                     }
@@ -303,12 +325,26 @@ function checkSong(e, ev){
             for (var i = es.length - 1; i > 0; i--) {
                 if (e == es[i] || keepLooping == "true") {
                     if (es[i - 1].disabled == false) {
-                        $(es[i - 1]).focus();
+//                        $(es[i - 1]).focus();
+                        focusField = es[i - 1];
                         break;
                     }
                     keepLooping = "true";
                 }
             }
+        }
+        if(focusField != ""){
+            if(typeof(e.count) == "undefined" || e.count == 0){
+                var rect = e.getBoundingClientRect();
+                e.count = 1;
+                $("#backicon").removeAttr("disabled").css("font-size", "5px").css("top", (rect.top - 22)+"px").css("left", (rect.left - 0)+"px").show();
+                console.log(e.count + " " + typeof(e.count));
+                return;
+            }else{
+                e.count = 0;
+                focusField.focus();
+            }
+            return;
         }
     }
 
@@ -334,7 +370,7 @@ function checkSong(e, ev){
     if(entered == correctAnswer){
         // Correct, so make it green and disable it
         if(indexOfCurrent < (es.length -1)){
-            // Focus on the next empty field
+            // Focus on the next empty field on the same line
             for(var jj=indexOfCurrent +1; jj<(es.length); jj++){
                 // message(11, jj + " " + es[jj].disabled + " " + (es.length-1));
                 if(!es[jj].disabled){
@@ -345,8 +381,8 @@ function checkSong(e, ev){
                 }
             }
             es[indexOfCurrent].value = Tracks[number-1].answersText[indexOfCurrent];
-        }else if(number < 10){
-            $(document.getElementsByName(randomNumber + "~answer_" + (number*1+1*1))[0]).focus();
+//        }else if(number < 10){
+//            $(document.getElementsByName(randomNumber + "~answer_" + (number*1+1*1))[0]).focus();
         }
         es[indexOfCurrent].style.background = "#9dffc3";
         es[indexOfCurrent].disabled = true;
@@ -508,11 +544,14 @@ function replay(snippet){
         return;
     }
     if(playFull == "false") {
+        if(playInProgress) return false;
+        if(introRun == "true") if(!deductPoints(50)) return;
         document.getElementById("row" + (snippet)).style.background = "#455e9c";
-        if(introRun == "true") deductPoints(50);
         
         Tracks[snippet-1].play();
+        playInProgress = true;
         setTimeout(function () {
+            playInProgress = false;
             Tracks[snippet-1].stop();
             document.getElementById("row" + (snippet)).style.background = "";
         }, duration );
@@ -537,12 +576,28 @@ function replay(snippet){
 }
 
 function showPoints(){
-    $("#score").html("This Game: " + Math.ceil(points));
+    $("#score").html("Credits: " + Math.ceil(points));
+}
+function purchaseCredits(response){
+    points+=500;
+    showPoints();
 }
 
+function offerToPurchase(response){
+    if(response){
+        messageUser("Good choice! We are feeling generous today, extra credits are on us.", "", purchaseCredits);
+    }
+}
 function deductPoints(number){
+    if((points - number) < 0){
+        messageUser("You do not have enough credits. Purchase more?", "No Thanks", offerToPurchase);
+//        messageUser("Using these replay buttons will cost you points", "That's ridiculous!", confirmWarning, snippet);
+        
+        return false;
+    }
     points -= number;
     showPoints();
+    return true;
 }
 function addPoints(number){
     points += number;
@@ -613,6 +668,7 @@ function getNextSet(){
 function surrenderAll(e){
     // playClick();
 //    alert(playedUpTo);
+    document.getElementById("lifeline").disabled = true;
     if (playedUpTo != -1) Tracks[playedUpTo].stop();
     pausePlaying=true;
     for(var i=1; i<=10;i++){
@@ -620,8 +676,14 @@ function surrenderAll(e){
 
 //        $("input:text").prop("disabled", "true");
         for(var j=0;j<fields.length;j++){
+            if(fields[j].value == Tracks[i-1].answersText[j]){
+                $(fields[j]).css("background", "#9dffc3");
+            }else{
+                $(fields[j]).css("background", "indianred").css("color", "black").css("opacity", "1");
+            }
             fields[j].value = Tracks[i-1].answersText[j];
             fields[j].disabled = true;
+//            $(fields[j]).css("border-radius", "9px").css("color", "beige");
         }
     }
     e.style.display = "none";
@@ -715,23 +777,27 @@ function useLifeline(e){
 
         // Play different snippet
     }else if (e.value == 3){
-        deductPoints(500);
+        if(!deductPoints(500)) return;
 
         loadSnippets();
         // Remove from the list of lifelines
         $(e[e.selectedIndex]).remove();
-        document.getElementById("row" + (++playedUpTo)).style.background = "";
-        nextSnippet(0);
+        if(playedUpTo > 0 && playedUpTo < 10){
+            document.getElementById("row" + (++playedUpTo)).style.background = "";
+        }
+//        nextSnippet(0);
 
         // Play longer snippet
     }else if (e.value == 2){
+        if(!deductPoints(Math.ceil(duration / 25))) return;
         duration = duration * 1 + 500;
-        deductPoints(Math.ceil(duration / 25));
         if(duration > 4000){ // Remove from the list of lifelines
             $(e[e.selectedIndex]).remove();
         }
-        document.getElementById("row" + (++playedUpTo)).style.background = "";
-        nextSnippet(0);
+        if(playedUpTo > 0 && playedUpTo < 10){
+            document.getElementById("row" + (++playedUpTo)).style.background = "";
+        }
+//        nextSnippet(0);
     }
     e.selectedIndex = 0;
     return;
@@ -1033,7 +1099,7 @@ function showReport(){
 }
 
 function cleanupErrorDiv(){
-    $( "#options" ).toggle("slide", {direction:"right"}, "slow")
+//    $( "#options" ).toggle("slide", {direction:"right"}, "slow")
     $( "#reportProblem" ).toggle("slide", {direction:"left"}, "slow")
     f.songError.value = "-1";
     f.reasonError.value = "-1";
@@ -1048,6 +1114,7 @@ function cleanupAboutDiv(){
 function runIntro(){
     if(introRun == "true") return true;
     $("#runIntro1").css("display", "table-row");
+    $("button").attr("disabled", "true");
     $("select").attr("disabled", "true");
     $("input").attr("readonly", "true");
     var classes = document.getElementsByClassName("trackTD");
@@ -1172,6 +1239,10 @@ function swipePause(){
     $("#pause").css("display", "block");
     
     evolve(document.getElementById("pause"), 0);
+    if(introRun == "false"){
+        $("#runIntro6").hide();
+        setTimeout(slideSwipebox, 2000, 2);
+    }
 }
 function swipePlay(){
 
@@ -1193,6 +1264,10 @@ function swipePlay(){
     if(document.getElementById("pause").style.display != "none") {
         // message(11, document.getElementById("pause").style.display);
         disolve(document.getElementById("pause"), 1);
+    }
+    if(introRun == "false"){
+        $("#runIntro6").hide();
+        setTimeout(slideSwipebox, 3000, 1);
     }
     replayFull();
 }
@@ -1231,6 +1306,11 @@ function biggerFont(){
     adjustInputSizes();
     handleViewport(fontSize);
     $("#page").center();
+    if(introRun == "false"){
+        $("#runIntro6").hide();
+        setTimeout(slideSwipebox, 1000, 3);
+    }
+    
 }
 function smallerFont(){
     if(fontSize == "6") return;
@@ -1239,6 +1319,10 @@ function smallerFont(){
     adjustInputSizes();
     handleViewport(fontSize);
     $("#page").center();
+    if(introRun == "false"){
+        $("#runIntro6").hide();
+        setTimeout(slideSwipebox, 1000, 4);
+    }
 }
 
 function shareToTwitter(){
@@ -1547,6 +1631,7 @@ function nextBubble(i, skip){
     playClick();
     if(typeof(skip) == "undefined"){
     switch (i){
+            // Use individual buttons to replay a snippet.
         case 1: replay(3);
             break;
         case 2:
@@ -1559,15 +1644,16 @@ function nextBubble(i, skip){
         case 5:
             f.genre.size = 0;
             if(isMobileDevice){
-                slideSwipebox(0);
-                break;
-            }
-        case 6:
-            // Listen for swipe to replay
+                DISABLESWIPE = false;
+                // Listen for swipe to replay
                 document.removeEventListener('touchstart', handleTouchStart, false);
                 document.removeEventListener('touchmove', handleTouchMove, false);
                 document.addEventListener('touchstart', handleTouchStart, false);
                 document.addEventListener('touchmove', handleTouchMove, false);
+                slideSwipebox(0);
+                break;
+            }
+        case 6:
             $("input").removeAttr("readonly");
             $("select").removeAttr("disabled");
             $("#runIntro" +i).hide();
@@ -1585,46 +1671,25 @@ function nextBubble(i, skip){
 }
 
 function slideSwipebox(count){
+    $("#runIntro6").show();
     switch (count){
-        case 0:
-//            $("#swipeHint").center();
+        case 0: // Swipe down to resume play
             $("#endHints").html("")
-            $("#swipeHint").html("Swipe up to pause play<br>");
-            setTimeout(slideSwipebox, 500, 1);
+            $("#swipeHint").html("Swipe down to resume play<br>");
             break;
         case 1: // Swipe up
-            $("#runIntro6").animate({marginTop: "-100px"}, 200).animate({marginTop: "+0px"}, 600);
-            setTimeout(slideSwipebox, 2000, 2);
+            $("#swipeHint").html("Swipe up to pause play<br>");
             break;
-        case 2: // Swipe down
-            $("#swipeHint").html("Swipe down to resume play<br>");
-            setTimeout(slideSwipebox, 500, 3);
-            break;
-        case 3: // Swipe down
-//            $("#swipeHint").html("Down to resume play");
-            $("#runIntro6").animate({marginTop: "+100px"}, 200).animate({marginTop: "+0px"}, 600);
-            setTimeout(slideSwipebox, 2000, 4);
-            break;
-        case 4: // Left Prep
+        case 2: // Left
             $("#swipeHint").html("Swipe left to increase font<br>");
-            setTimeout(slideSwipebox, 500, 5);
             break;
-        case 5: // Left
-            $("#runIntro6").animate({marginLeft: "-50px"}, 200).animate({marginLeft: "+0px"}, 600);
-            biggerFont();
-            biggerFont();
-            setTimeout(slideSwipebox, 2000, 6);
-            break;
-        case 6: // Right prep
+        case 3: // Right
             $("#swipeHint").html("Swipe Right to decrease font<br>");
-            setTimeout(slideSwipebox, 500, 7);
             break;
-        case 7: // Right
-            $("#runIntro6").animate({marginLeft: "+50px"}, 200).animate({marginLeft: "+0px"}, 600);
-            smallerFont();
-            smallerFont();
-            $("#endHints").html("Begin")
-//            setTimeout(slideSwipebox, 2000, 3);
+        case 4: // Finished
+            $("#swipeHint").html("Walkthrough Complete.");
+            $("#endHints").html("Begin");
+            introRun = "true";
             break;
     }
 }
@@ -1633,3 +1698,159 @@ function walkThrough(){
     introRun="false";
     runIntro();
 }
+
+var IAP = {
+list: [ "1148656369", "additionalLife", "za.co.oursort.additionalLife", "za.co.oursort.AccessDecade", "AccessDecade" ] };
+
+
+IAP.load = function () {
+    alert("IAP.onload");
+    // Check availability of the storekit plugin
+    if (!window.storekit) {
+        console.log("In-App Purchases not available");
+        return;
+    }
+    
+    // Initialize
+    storekit.init({
+                  debug:    true, // Enable IAP messages on the console
+                  ready:    IAP.onReady,
+                  purchase: IAP.onPurchase,
+                  restore:  IAP.onRestore,
+                  error:    IAP.onError
+                  });
+};
+
+// StoreKit's callbacks (we'll talk about them later)
+IAP.onReady = function () {};
+IAP.onPurchase = function () {};
+IAP.onRestore = function () {};
+IAP.onError = function () {};
+
+IAP.onReady = function () {
+    alert("IAP.onready");
+    storekit.verbosity = storekit.DEBUG;
+    // Once setup is done, load all product data.
+    storekit.load(IAP.list, function (products, invalidIds) {
+                  console.log("Products length " + products.length);
+                  for (var j = 0; j < products.length; ++j) {
+                    var p = products[j];
+                    console.log('Loaded IAP(' + j + '). title:' + p.title +
+                                ' description:' + p.description +
+                                ' price:' + p.price +
+                                ' id:' + p.id);
+                    IAP.products[p.id] = p;
+                  }
+//                  IAP.products = products;
+                  IAP.loaded = true;
+                  for (var i = 0; i < invalidIds.length; ++i) {
+                    console.log("Error: could not load " + invalidIds[i]);
+                  }
+    });
+};
+
+
+var renderIAPs = function (el) {
+    alert("renderfunction");
+    if (IAP.loaded) {
+        var life  = IAP.products["additionalLife"];
+        var html = "<ul>";
+        for (var id in IAP.products) {
+            var prod = IAP.products[id];
+            html += "<li>" +
+            "<h3>" + prod.title + "</h3>" +
+            "<p>" + prod.description + "</p>" +
+            "<button type='button' " +
+            "onclick='IAP.buy(\"" + prod.id + "\")'>" +
+            prod.price + "</button>" +
+            "</li>";
+        }
+        html += "</ul>";
+        el.innerHTML = html;
+    }else {
+        el.innerHTML = "In-App Purchases not available.";
+    }
+};
+
+
+
+
+// New code for add ons
+//
+//define([], function () {
+//       'use strict';
+
+//       var IAP = {
+//        list: [ "additionalLife", "za.co.oursort.additionalLife", "za.co.oursort.AccessDecade", "AccessDecade" ],
+//        products: {}
+//       };
+//       var localStorage = window.localStorage || {};
+//       
+//       IAP.initialize = function () {
+//           // Check availability of the storekit plugin
+//           if (!window.storekit) {
+//               console.log('In-App Purchases not available');
+//               return;
+//           }
+//       
+//           // Initialize
+//           storekit.init({
+//                     ready:    IAP.onReady,
+//                     purchase: IAP.onPurchase,
+//                     restore:  IAP.onRestore,
+//                     error:    IAP.onError
+//                     });
+//        };
+//       
+//       IAP.onReady = function () {
+//       // Once setup is done, load all product data.
+//           storekit.load(IAP.list, function (products, invalidIds) {
+//                     console.log('IAPs loading done:');
+//                     for (var j = 0; j < products.length; ++j) {
+//                        var p = products[j];
+//                        console.log('Loaded IAP(' + j + '). title:' + p.title +
+//                                 ' description:' + p.description +
+//                                 ' price:' + p.price +
+//                                 ' id:' + p.id);
+//                        IAP.products[p.id] = p;
+//                     }
+//                     IAP.loaded = true;
+//                     for (var i = 0; i < invalidIds.length; ++i) {
+//                        console.log('Error: could not load ' + invalidIds[i]);
+//                     }
+//            });
+//       };
+//       
+//       IAP.onPurchase = function (transactionId, productId/*, receipt*/) {
+//           var n = (localStorage['storekit.' + productId]|0) + 1;
+//           localStorage['storekit.' + productId] = n;
+//           if (IAP.purchaseCallback) {
+//               IAP.purchaseCallback(productId);
+//               delete IAP.purchaseCallbackl;
+//           }
+//       };
+//       
+//       IAP.onError = function (errorCode, errorMessage) {
+//           alert('Error: ' + errorMessage);
+//       };
+//       
+//       IAP.onRestore = function (transactionId, productId/*, transactionReceipt*/) {
+//           var n = (localStorage['storekit.' + productId]|0) + 1;
+//           localStorage['storekit.' + productId] = n;
+//       };
+//       
+//       IAP.buy = function (productId, callback) {
+//           IAP.purchaseCallback = callback;
+//           storekit.purchase(productId);
+//       };
+//       
+//       IAP.restore = function () {
+//           storekit.restore();
+//       };
+//       
+//       IAP.fullVersion = function () {
+//           return localStorage['storekit.babygooinapp1'];
+//       };
+
+//       return IAP;
+//       });

@@ -18,7 +18,9 @@
     <script type="text/javascript" src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
     <link media="all" type="text/css" href="css/smc.css" rel="stylesheet">
     <link media="all" type="text/css" href="css/speechbubbles.css" rel="stylesheet">
-<!--    <script type="text/javascript" src="js/cordova.js"></script>-->
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="cordova_plugins.js"></script>
+<!--    <script type="text/javascript" src="store-ios.js"></script>-->
 <!--    <script type="text/javascript" src="js/SocialSharing.js"></script>-->
 <script src="js/jquery.easing.js"></script>
 <script src="js/jquery.ui.swirl.js"></script>
@@ -58,26 +60,15 @@
         <tbody>
         <tr id="fontTR" style="display:none">
             <td width="99%" onClick="smallerFont()"><b style="font-size: 10px"><</b><b style="font-size: 12px" ><</b><b style="font-size: 14px" ><</b></td>
-            <td onClick="biggerFont()"><b style="font-size: 16px">></b><b style="font-size: 14px" >></b><b style="font-size: 12px" >></b>
+            <td align="right" onClick="biggerFont()"><b style="font-size: 16px;align:right">></b><b style="font-size: 14px" >></b><b style="font-size: 12px" >></b>
             </td>
         </tr>
         <tr>
             <td style="font:2em">Split Music Challenge</td>
-            <td style="text-align:right">
-                <img id="optionsImg" onclick='showOptions();' src="img/optionsblueonblack.jpg" height="20" style='vertical-align:middle'/>
+            <td align="right">
+                <button type="button" id="optionsImg" onclick='showOptions();' />
             </td>
         </tr>
-        <!--
-        <tr id="runIntro3" class="intro">
-            <td></td>
-            <td width=90%>
-                <div class="triangle-right right comment_bubble" id=comment_bubble3>Introduction<br>&nbsp;<br>
-                    The menu button lets you report an error or review the rules.
-                    <br>&nbsp;<br><div style="text-align:right;width:100%;display:block" onclick="nextBubble(3)">Next</div>
-                </div>
-            </td>
-        </tr>
-         -->
         </tbody>
     </table>
     <div id="options" style="background:#455e9c;opacity:1">
@@ -173,8 +164,8 @@
             If you get stuck, you have a few options.
             <br>
             While a game is in progress, clicking the <button tabindex="2"  onclick='return false'
-                type="button" class="buttonTrack"><i>#</i></button> buttons will replay the
-            snippet for that song. Gonna cost you though. <i>Clicking this button when the game is over will let you listen
+                type="button" class="buttonTrack"><i>#</i></button> buttons will replay that
+            snippet. Gonna cost you though. <i>Clicking this button when the game is over will let you listen
             to more of the song in case something catches your ear.</i><br>
             &nbsp;
             <br>Otherwise, there are the life lines at the top right of the screen.
@@ -213,7 +204,7 @@
         <tbody>
         <tr>
             <td id="subHeader">
-                <div id="score">This Game: 0</div><br>
+                <div id="score">Credits: 0</div><br>
                 <div id="pointsTD">
                     Total Score: 0
                     <br>
@@ -454,7 +445,7 @@
         <div class="intro gradient" id=runIntro6 style="width:60%">Hint<br>&nbsp;<br>
             <table cellpadding=1em>
                 <tr><td width=20%></td>
-                    <td align=center id=swipeHint>Swipe up to pause play<br></td>
+                    <td align=center id=swipeHint><br></td>
                     <td width=20%></td>
                 </tr>
                 </table>
@@ -466,6 +457,7 @@
 <div id="splashiphone">&nbsp;</div>
 <div id="startGame" onClick="nextSnippet(0)" style="display:none; padding:10px"> Start Game </div>
 <div id="winsplash" style="display:none"> Bonus points! </div>
+<button type="button" id="backicon" onclick="return false" class="buttonTrack" style="height:20px; width:20px;display:none;position:absolute; font-size:0.5em"><<</button>
 <div id="alerts">
     <table>
         <tr><th>FYI</th></tr>
@@ -474,6 +466,7 @@
     </table>
 </div>
 <div id="connection" style="display:none"> <br>&nbsp;<br>&nbsp;<br>&nbsp;Bad Internet Connection <br>Swipe to try again</div>
+<div id="in-app-purchase-list"></div>
 </form>
 </body>
 </html>

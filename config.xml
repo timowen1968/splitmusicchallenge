@@ -25,6 +25,7 @@
     <preference name="disable-cursor" value="false" />
     <preference name="android-minSdkVersion" value="14" />
     <preference name="android-installLocation" value="auto" />
+    <gap:plugin name="cc.fovea.cordova.purchase" source="npm" version="6.0.0" />
     <gap:plugin name="org.apache.cordova.battery-status" />
     <gap:plugin name="org.apache.cordova.camera" />
     <gap:plugin name="org.apache.cordova.media-capture" />
@@ -70,10 +71,6 @@
     <gap:splash gap:platform="ios" height="1024" src="www/res/screen/ios/screen-ipad-portrait.png" width="768" />
     <gap:splash gap:platform="ios" height="768" src="www/res/screen/ios/screen-ipad-landscape.png" width="1024" />
     <gap:splash gap:platform="winphone" src="www/res/screen/windows-phone/screen-portrait.jpg" />
-<plugin name="com.phonegap.plugins.facebookconnect" spec="0.4.0"> source="pgb">
-    <param name="APP_ID" value="..." />
-    <param name="APP_NAME" value="..." />
-</plugin>
     <access origin="*" />
     <!--<access origin="http://www.oursort.co.za" />-->
     <plugin name="cordova-plugin-whitelist" version="1" />

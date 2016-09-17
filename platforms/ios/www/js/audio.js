@@ -148,6 +148,8 @@ function nextSnippet(next){
 
     $("#startGame").hide();
     $("button").prop("disabled", true);
+    $("#backicon").prop("disabled", false);
+    console.log("seetng it to faslse");
     $("select").prop("disabled", true);
     $("#surrender_all").prop("disabled", false);
     // Stop at the end of the playlist
@@ -171,7 +173,7 @@ function nextSnippet(next){
         Tracks[next-1].stop();
         
         if(!pausePlaying || playFull === "true")
-        document.getElementById("row" + (next)).style.background = "";
+            document.getElementById("row" + (next)).style.background = "";
 
         if(next == 10) {
             $("button").prop("disabled", false);
@@ -186,6 +188,9 @@ function nextSnippet(next){
         $("select").prop("disabled", false);
         playInProgress = false;
         pausePlaying = false;
+        if(introRun == "false"){
+            document.getElementById("row" + (next)).style.background = "";
+        }
         return;
     }
     playInProgress = true;

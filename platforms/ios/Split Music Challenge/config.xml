@@ -15,6 +15,9 @@
         <param name="ios-package" value="CDVGestureHandler" />
         <param name="onload" value="true" />
     </feature>
+    <feature name="InAppPurchase">
+        <param name="ios-package" value="InAppPurchase" />
+    </feature>
     <name>Split Music Challenge</name>
     <description>
         Split Music Challenge
@@ -23,6 +26,7 @@
         PhoneGap Team
     </author>
     <content src="index.html" />
+    <gap:plugin name="cc.fovea.cordova.purchase" source="npm" version="6.0.0" />
     <gap:plugin name="org.apache.cordova.battery-status" />
     <gap:plugin name="org.apache.cordova.camera" />
     <gap:plugin name="org.apache.cordova.media-capture" />

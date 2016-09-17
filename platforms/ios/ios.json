@@ -4,16 +4,40 @@
         "uninstalled": []
     },
     "config_munge": {
-        "files": {}
+        "files": {
+            "config.xml": {
+                "parents": {
+                    "/*": [
+                        {
+                            "xml": "<feature name=\"InAppPurchase\"><param name=\"ios-package\" value=\"InAppPurchase\" /></feature>",
+                            "count": 1
+                        }
+                    ]
+                }
+            }
+        }
     },
     "installed_plugins": {
         "cordova-plugin-whitelist": {
             "PACKAGE_NAME": "com.phonegap.helloworld"
+        },
+        "cc.fovea.cordova.purchase": {
+            "PACKAGE_NAME": "com.phonegap.helloworld"
         }
     },
     "dependent_plugins": {},
-    "modules": [],
+    "modules": [
+        {
+            "id": "cc.fovea.cordova.purchase.InAppPurchase",
+            "file": "plugins/cc.fovea.cordova.purchase/www/store-ios.js",
+            "pluginId": "cc.fovea.cordova.purchase",
+            "clobbers": [
+                "store"
+            ]
+        }
+    ],
     "plugin_metadata": {
-        "cordova-plugin-whitelist": "1.2.2"
+        "cordova-plugin-whitelist": "1.2.2",
+        "cc.fovea.cordova.purchase": "6.0.0"
     }
 }

@@ -1,3 +1,4 @@
+alert("c3");
 cordova.define("cordova-plugin-console.console", function(require, exports, module) {
 /*
  *
