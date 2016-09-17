@@ -1,4 +1,4 @@
-alert("c6");
+alert("../www/plugins/cordova-plugin-console/www/console-via-logger.js");
 cordova.define("cordova-plugin-console.console", function(require, exports, module) {
 /*
  *

@@ -7,9 +7,6 @@
         "files": {}
     },
     "installed_plugins": {
-        "cordova-plugin-whitelist": {
-            "PACKAGE_NAME": "com.phonegap.helloworld"
-        },
         "cc.fovea.cordova.purchase": {
             "PACKAGE_NAME": "com.phonegap.helloworld"
         }

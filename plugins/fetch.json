@@ -9,9 +9,8 @@
     },
     "cc.fovea.cordova.purchase": {
         "source": {
-            "type": "git",
-            "url": "git://github.com/j3k0/PhoneGap-InAppPurchase-iOS.git",
-            "subdir": "."
+            "type": "registry",
+            "id": "cc.fovea.cordova.purchase"
         },
         "is_top_level": true,
         "variables": {}
