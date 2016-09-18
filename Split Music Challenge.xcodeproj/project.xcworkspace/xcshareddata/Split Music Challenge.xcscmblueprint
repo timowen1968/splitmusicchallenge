@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "C8451CDCA8C3A2C60918622510D5B58C3A709FF1",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "C8451CDCA8C3A2C60918622510D5B58C3A709FF1" : 9223372036854775807,
+    "BB06003584F9F3116F06215C6574376436FA8F0A" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "2363C582-9988-4D4B-90B6-2925599F11BC",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "C8451CDCA8C3A2C60918622510D5B58C3A709FF1" : "ios\/",
+    "BB06003584F9F3116F06215C6574376436FA8F0A" : "ios\/CordovaLib\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "Split Music Challenge",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "Split Music Challenge.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/timowen1968\/cordova.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "BB06003584F9F3116F06215C6574376436FA8F0A"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/timowen1968\/splitmusicchallenge.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "C8451CDCA8C3A2C60918622510D5B58C3A709FF1"
+    }
+  ]
+}
